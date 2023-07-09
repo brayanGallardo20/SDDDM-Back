@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pe.gob.minjus.sisarb.model.mapper.ArbitroMapper">
+
+    <sql id="columnsSelectFindById">
+        ARBITRO_ID,
+        PERSONA_ID,
+        TIPO_ARBITRO_ID,
+        ENTIDAD_FINANCIERA_ID,
+        NRO_CUENTA,
+        NRO_CUENTA_CCI,
+        PAGINA_WEB,
+        HABILITADO,
+        FALLECIDO,
+        PROFESION,
+        OBSERVACION,
+        AUDIT_USUARIO_CREACION,
+        AUDIT_FECHA_CREACION
+        AUDIT_USUARIO_MODIFICA,
+        AUDIT_FECHA_MODIFICA
+    </sql>
+
+
+    <resultMap id="resultFindById" type="pe.gob.minjus.sisarb.model.domain.Arbitro">
+        <id  property="arbitroId"                       column="ARBITRO_ID"  />
+        <result property="personaId"                       column="PERSONA_ID" />
+        <result property="tipoArbitroId"                        column="TIPO_ARBITRO_ID" />
+        <result property="entidadFinancieraId"                        column="ENTIDAD_FINANCIERA_ID" />
+        <result property="nroCuenta"                        column="NRO_CUENTA" />
+        <result property="nroCuentaCci"                        column="NRO_CUENTA_CCI" />
+        <result property="paginaWeb"                        column="PAGINA_WEB" />
+        <result property="habilitado"                        column="HABILITADO" />
+        <result property="fallecido"                        column="FALLECIDO" />
+        <result property="profesion"                        column="PROFESION" />
+        <result property="observacion"                        column="OBSERVACION" />
+        <result property="auditUsuarioCreacion"         column="AUDIT_USUARIO_CREACION" />
+        <result property="auditFechaCreacion"           column="AUDIT_FECHA_CREACION" />
+        <result property="auditUsuarioModifica"         column="AUDIT_USUARIO_MODIFICA" />
+        <result property="auditFechaModifica"           column="AUDIT_FECHA_MODIFICA" />
+    </resultMap>
+
+    <sql id="columnsInsert">
+        ARBITRO_ID,
+        PERSONA_ID,
+        TIPO_ARBITRO_ID,
+        ENTIDAD_FINANCIERA_ID,
+        NRO_CUENTA,
+        NRO_CUENTA_CCI,
+        PAGINA_WEB,
+        HABILITADO,
+        FALLECIDO,
+        PROFESION,
+        OBSERVACION,
+        ACTIVO,
+        AUDIT_USUARIO_CREACION,
+        AUDIT_FECHA_CREACION
+    </sql>
+
+    <insert id="save"  parameterType="pe.gob.minjus.sisarb.model.domain.Arbitro">
+        <selectKey keyProperty="arbitroId" order="BEFORE" resultType="java.lang.Integer">
+            SELECT SEQ_TRS_ARBITRO.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TRS_ARBITRO (<include refid="columnsInsert" />) values
+        (
+        #{arbitroId, jdbcType=INTEGER},
+        #{personaId, jdbcType=INTEGER},
+        #{tipoArbitroId, jdbcType=INTEGER},
+        #{entidadFinancieraId, jdbcType=INTEGER},
+        REGEXP_REPLACE(TRIM(UPPER(#{nroCuenta, jdbcType=VARCHAR})), ' +', ' '),
+        REGEXP_REPLACE(TRIM(UPPER(#{nroCuentaCci, jdbcType=VARCHAR})), ' +', ' '),
+        TRIM(#{paginaWeb, jdbcType=VARCHAR}),
+        #{habilitado, jdbcType=INTEGER},
+        #{fallecido, jdbcType=INTEGER},
+        REGEXP_REPLACE(TRIM(UPPER(#{profesion, jdbcType=VARCHAR})), ' +', ' '),
+        REGEXP_REPLACE(TRIM(UPPER(#{observacion, jdbcType=VARCHAR})), ' +', ' '),
+        1,
+        TRIM(UPPER(#{auditUsuarioCreacion,jdbcType=VARCHAR})),
+        sysdate)
+    </insert>
+
+    <update id="update" parameterType="pe.gob.minjus.sisarb.model.domain.Arbitro">
+        UPDATE TRS_ARBITRO
+        SET
+        AUDIT_FECHA_MODIFICA=sysdate
+        <if test="personaId">,PERSONA_ID =#{personaId, jdbcType=INTEGER}</if>
+        <if test="tipoArbitroId">,TIPO_ARBITRO_ID =#{tipoArbitroId, jdbcType=INTEGER}</if>
+        <if test="entidadFinancieraId != null">,ENTIDAD_FINANCIERA_ID =#{entidadFinancieraId, jdbcType=INTEGER}</if>
+        <if test="nroCuenta != null and nroCuenta!=''">,NRO_CUENTA =REGEXP_REPLACE(TRIM(UPPER(#{nroCuenta, jdbcType=VARCHAR})), ' +', ' ') </if>
+        <if test="nroCuentaCci != null and nroCuentaCci!=''">,NRO_CUENTA_CCI =REGEXP_REPLACE(TRIM(UPPER(#{nroCuentaCci, jdbcType=VARCHAR})), ' +', ' ') </if>
+        <if test="paginaWeb != null and paginaWeb!=''">,PAGINA_WEB =TRIM(#{paginaWeb, jdbcType=VARCHAR}) </if>
+        <if test="habilitado != null">,HABILITADO =#{habilitado, jdbcType=INTEGER}</if>
+        <if test="fallecido != null">,FALLECIDO =#{fallecido, jdbcType=INTEGER}</if>
+        <if test="profesion != null and profesion!=''">,PROFESION =REGEXP_REPLACE(TRIM(UPPER(#{profesion, jdbcType=VARCHAR})), ' +', ' ') </if>
+        <if test="observacion != null and observacion!=''">,OBSERVACION =REGEXP_REPLACE(TRIM(UPPER(#{observacion, jdbcType=VARCHAR})), ' +', ' ') </if>
+        <if test="auditUsuarioModifica != null and auditUsuarioModifica!=''">, AUDIT_USUARIO_MODIFICA=TRIM(UPPER(#{auditUsuarioModifica, jdbcType=VARCHAR})) </if>
+        where ARBITRO_ID=#{arbitroId, jdbcType=INTEGER}
+    </update>
+
+    <select id="findById" resultMap="resultFindById" parameterType="java.lang.Integer">
+        SELECT
+        <include refid="columnsSelectFindById">
+        </include>
+        FROM TRS_ARBITRO
+        WHERE ACTIVO=1 AND ARBITRO_ID = #{id, jdbcType=INTEGER}
+    </select>
+
+    <update id="deleteById" parameterType="java.lang.Integer">
+        UPDATE TRS_ARBITRO
+        SET
+        ACTIVO=0
+        where ARBITRO_ID=#{id, jdbcType=INTEGER}
+    </update>
+</mapper>

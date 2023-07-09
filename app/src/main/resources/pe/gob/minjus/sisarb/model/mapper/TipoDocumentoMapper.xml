@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pe.gob.minjus.sisarb.model.mapper.TipoDocumentoMapper">
+
+    <sql id="columnsSelect">
+        TIPO_DOCUMENTO_ID,
+        NOMBRE,
+        PIDE,
+        AUDIT_USUARIO_CREACION,
+        AUDIT_FECHA_CREACION,
+        AUDIT_USUARIO_MODIFICA,
+        AUDIT_FECHA_MODIFICA,
+
+        TO_CHAR(AUDIT_FECHA_CREACION, 'yyyy-mm-dd hh24:mi')  AUDIT_FECHA_CREACION_FORMAT,
+        TO_CHAR(AUDIT_FECHA_MODIFICA, 'yyyy-mm-dd hh24:mi') AUDIT_FECHA_MODIFICA_FORMAT
+    </sql>
+    
+   <sql id="columnsSelectView">
+        TIPO_DOCUMENTO_ID,
+		PIDE,
+		NOMBRE,
+		MENSAJE,
+		FORMATO,
+		NUMEROCARACTERES,
+		ACTIVO
+    </sql>
+
+    <sql id="columnsInsert">
+        TIPO_DOCUMENTO_ID,
+        NOMBRE,
+        PIDE,
+        ACTIVO,
+        AUDIT_USUARIO_CREACION,
+        AUDIT_FECHA_CREACION
+    </sql>
+
+
+    <resultMap id="resultlistPaginated" type="pe.gob.minjus.sisarb.model.domain.TipoDocumento">
+        <id  property="tipoDocumentoId"                 column="TIPO_DOCUMENTO_ID"  />
+        <result property="nombre"                       column="NOMBRE" />
+        <result property="pide"                         column="PIDE" />
+        <result property="auditUsuarioCreacion"         column="AUDIT_USUARIO_CREACION" />
+        <result property="auditFechaCreacion"           column="AUDIT_FECHA_CREACION" />
+        <result property="auditUsuarioModifica"         column="AUDIT_USUARIO_MODIFICA" />
+        <result property="auditFechaModifica"           column="AUDIT_FECHA_MODIFICA" />
+
+        <result property="auditFechaCreacionFormat"     column="AUDIT_FECHA_CREACION_FORMAT" />
+        <result property="auditFechaModificaFormat"     column="AUDIT_FECHA_MODIFICA_FORMAT" />
+    </resultMap>
+
+    <resultMap id="resultlistAll" type="pe.gob.minjus.sisarb.model.domain.TipoDocumento">
+        <id  property="tipoDocumentoId"                 column="TIPO_DOCUMENTO_ID"  />
+        <result property="nombre"                       column="NOMBRE" />
+        <result property="mensaje"                      column="MENSAJE" />
+        <result property="formato"                      column="FORMATO" />
+        <result property="numeroCaracteres"             column="NUMEROCARACTERES" />
+         <result property="activo"                      column="ACTIVO" />
+    </resultMap>
+
+    <select id="listPaginated" resultMap="resultlistPaginated" parameterType="pe.gob.minjus.sisarb.model.request.TipoDocumentoBusquedaRequest">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        FROM MAE_TIPO_DOCUMENTO
+        <include refid="listPaginatedWhere">
+            <property name="nombre" value="nombre"/>
+            <property name="pide" value="pide"/>
+            <property name="auditUsuarioCreacion" value="auditUsuarioCreacion"/>
+            <property name="auditFechaCreacion" value="auditFechaCreacion"/>
+            <property name="auditUsuarioModifica" value="auditUsuarioModifica"/>
+            <property name="auditFechaModifica" value="auditFechaModifica"/>
+        </include>
+        OFFSET #{filaInicio,jdbcType=INTEGER} ROWS FETCH NEXT #{cantidadPorPagina,jdbcType=INTEGER} ROWS ONLY
+    </select>
+    
+    <select id="listAll" resultMap="resultlistAll">
+        SELECT
+        <include refid="columnsSelectView">
+        </include>
+        FROM VW_TIPO_DOCUMENTO WHERE ACTIVO = 1
+     </select>
+
+    <sql id="listPaginatedWhere">
+        WHERE ACTIVO=1
+        <if test="nombre != null and nombre!=''"> AND NOMBRE  LIKE '%'|| REGEXP_REPLACE(TRIM(UPPER(#{nombre})), ' +', ' ')||'%' </if>
+        <if test="pide!=null"> AND PIDE =#{pide} </if>
+        <if test="auditUsuarioCreacion!=null and auditUsuarioCreacion!=''">
+            AND UPPER(AUDIT_USUARIO_CREACION) LIKE '%'||UPPER(#{auditUsuarioCreacion})||'%'
+        </if>
+        <if test="auditFechaCreacion!=null and auditFechaCreacion!=''">
+            AND TO_CHAR(AUDIT_FECHA_CREACION, 'yyyy-mm-dd hh24:mi:ss') LIKE '%'||UPPER(#{auditFechaCreacion})||'%'
+        </if>
+        <if test="auditUsuarioModifica!=null and auditUsuarioModifica!=''">
+            AND UPPER(AUDIT_USUARIO_MODIFICA) LIKE '%'||UPPER(#{auditUsuarioModifica})||'%'
+        </if>
+        <if test="auditFechaModifica!=null and auditFechaModifica!=''">
+            AND TO_CHAR(AUDIT_FECHA_MODIFICA, 'yyyy-mm-dd hh24:mi:ss') LIKE '%'||UPPER(#{auditFechaModifica})||'%'
+        </if>
+    </sql>
+
+    <!-- Query para calcular el total -->
+    <select id="listPaginatedTotal" resultType="java.lang.Integer" parameterType="pe.gob.minjus.sisarb.model.request.TipoDocumentoBusquedaRequest">
+        select count(1) total FROM MAE_TIPO_DOCUMENTO
+        <include refid="listPaginatedWhere">
+            <property name="nombre" value="nombre"/>
+            <property name="pide" value="pide"/>
+            <property name="auditUsuarioCreacion" value="auditUsuarioCreacion"/>
+            <property name="auditFechaCreacion" value="auditFechaCreacion"/>
+            <property name="auditUsuarioModifica" value="auditUsuarioModifica"/>
+            <property name="auditFechaModifica" value="auditFechaModifica"/>
+        </include>
+    </select>
+
+    <insert id="save"  parameterType="pe.gob.minjus.sisarb.model.domain.TipoDocumento">
+        <selectKey keyProperty="tipoDocumentoId" order="BEFORE" resultType="java.lang.Integer">
+            SELECT SEQ_MAE_TIPO_DOCUMENTO.NEXTVAL FROM DUAL
+        </selectKey>
+
+        INSERT INTO MAE_TIPO_DOCUMENTO (<include refid="columnsInsert" />) values
+        (
+        #{tipoDocumentoId, jdbcType=INTEGER},
+        REGEXP_REPLACE(TRIM(UPPER(#{nombre, jdbcType=VARCHAR})), ' +', ' '),
+        #{pide, jdbcType=INTEGER},
+        1,
+        #{auditUsuarioCreacion,jdbcType=VARCHAR},
+        sysdate)
+    </insert>
+
+    <update id="update" parameterType="pe.gob.minjus.sisarb.model.domain.TipoDocumento">
+        UPDATE MAE_TIPO_DOCUMENTO
+        SET
+        AUDIT_FECHA_MODIFICA=sysdate
+        <if test="nombre != null and nombre!=''">,NOMBRE =REGEXP_REPLACE(TRIM(UPPER(#{nombre, jdbcType=VARCHAR})), ' +', ' ') </if>
+        <if test="pide != null">,PIDE =#{pide, jdbcType=INTEGER} </if>
+        <if test="auditUsuarioModifica != null and auditUsuarioModifica!=''">, AUDIT_USUARIO_MODIFICA=TRIM(UPPER(#{auditUsuarioModifica, jdbcType=VARCHAR})) </if>
+        where TIPO_DOCUMENTO_ID=#{tipoDocumentoId, jdbcType=INTEGER}
+    </update>
+
+    <select id="findById" resultMap="resultlistPaginated" parameterType="java.lang.Integer">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        FROM MAE_TIPO_DOCUMENTO
+        WHERE ACTIVO=1 AND TIPO_DOCUMENTO_ID = #{id, jdbcType=INTEGER}
+    </select>
+
+    <update id="deleteById" parameterType="java.lang.Integer">
+        UPDATE MAE_TIPO_DOCUMENTO
+        SET
+        ACTIVO=0
+        where TIPO_DOCUMENTO_ID=#{id, jdbcType=INTEGER}
+    </update>
+
+    <sql id="columnsSelectChoose">
+        TIPO_DOCUMENTO_ID,
+        NOMBRE
+    </sql>
+
+    <select id="listChoose" resultMap="resultlistPaginated"  >
+        SELECT
+        <include refid="columnsSelectChoose">
+        </include>
+        FROM MAE_TIPO_DOCUMENTO WHERE ACTIVO=1
+    </select>
+
+    <select id="countByField" resultType="java.lang.Integer"  >
+        SELECT
+        COUNT(1)
+        FROM MAE_TIPO_DOCUMENTO
+        <include refid="countWhere">
+            <property name="nombre" value="nombre"/>
+        </include>
+    </select>
+
+    <select id="countByPide" resultType="java.lang.Integer"  >
+        SELECT
+        PIDE
+        FROM MAE_TIPO_DOCUMENTO
+        WHERE ACTIVO=1 AND
+        TIPO_DOCUMENTO_ID = #{tipoDocumentoId}
+    </select>
+
+    <sql id="countWhere">
+        WHERE ACTIVO=1
+        <if test="nombre != null and nombre!=''"> AND NOMBRE  LIKE '%'|| REGEXP_REPLACE(TRIM(UPPER(#{nombre})), ' +', ' ')||'%' </if>
+    </sql>
+
+</mapper>

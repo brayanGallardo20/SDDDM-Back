@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pe.gob.minjus.sisarb.model.mapper.EntidadFinancieraMapper">
+    
+    <resultMap id="resultlistPaginated" type="pe.gob.minjus.sisarb.model.domain.EntidadFinanciera">
+        <id  property="entidadFinancieraId"                 column="ENTIDAD_FINANCIERA_ID"  />
+        <result property="nombre"                       column="NOMBRE" />
+        <result property="orden"                       column="ORDEN" />
+        <result property="auditUsuarioCreacion"         column="AUDIT_USUARIO_CREACION" />
+        <result property="auditFechaCreacion"           column="AUDIT_FECHA_CREACION" />
+        <result property="auditUsuarioModifica"         column="AUDIT_USUARIO_MODIFICA" />
+        <result property="auditFechaModifica"           column="AUDIT_FECHA_MODIFICA" />
+
+        <result property="auditFechaCreacionFormat"     column="AUDIT_FECHA_CREACION_FORMAT" />
+        <result property="auditFechaModificaFormat"     column="AUDIT_FECHA_MODIFICA_FORMAT" />
+    </resultMap>
+
+    <sql id="columnsSelectChoose">
+        ENTIDAD_FINANCIERA_ID,
+        NOMBRE
+    </sql>
+
+    <select id="listChoose" resultMap="resultlistPaginated"  >
+        SELECT
+        <include refid="columnsSelectChoose">
+        </include>
+        FROM MAE_ENTIDAD_FINANCIERA WHERE ACTIVO=1
+    </select>
+
+</mapper>

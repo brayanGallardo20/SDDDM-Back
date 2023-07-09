@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pe.gob.minjus.sisarb.model.mapper.SedePersonaMapper">
+
+    <sql id="columnsSelect">
+        SP.SEDE_PERSONA_ID,
+        SP.SEDE_ID,
+        SP.PERSONA_ID,
+        SP.PERSONA_CARGO_ID
+        AUDIT_USUARIO_CREACION,
+        AUDIT_FECHA_CREACION,
+        AUDIT_USUARIO_MODIFICA,
+        AUDIT_FECHA_MODIFICA,
+        TO_CHAR(AUDIT_FECHA_CREACION, 'yyyy-mm-dd hh24:mi')  AUDIT_FECHA_CREACION_FORMAT,
+        TO_CHAR(AUDIT_FECHA_MODIFICA, 'yyyy-mm-dd hh24:mi') AUDIT_FECHA_MODIFICA_FORMAT
+    </sql>
+
+    <sql id="columnsInsert">
+        SEDE_PERSONA_ID,
+        SEDE_ID,
+        PERSONA_ID,
+        PERSONA_CARGO_ID,
+        ACTIVO,
+        AUDIT_USUARIO_CREACION,
+        AUDIT_FECHA_CREACION
+    </sql>
+
+
+    <resultMap id="resultList" type="pe.gob.minjus.sisarb.model.domain.SedePersona">
+        <id  property="sedePersonaId"                   column="SEDE_PERSONA_ID"  />
+        <result property="sedeId"                       column="SEDE_ID" />
+        <result property="personaId"                    column="PERSONA_ID" />
+        <result property="personaCargoId"               column="PERSONA_CARGO_ID" />
+        <result property="auditUsuarioCreacion"         column="AUDIT_USUARIO_CREACION" />
+        <result property="auditFechaCreacion"           column="AUDIT_FECHA_CREACION" />
+        <result property="auditUsuarioModifica"         column="AUDIT_USUARIO_MODIFICA" />
+        <result property="auditFechaModifica"           column="AUDIT_FECHA_MODIFICA" />
+
+        <result property="auditFechaCreacionFormat"     column="AUDIT_FECHA_CREACION_FORMAT" />
+        <result property="auditFechaModificaFormat"     column="AUDIT_FECHA_MODIFICA_FORMAT" />
+    </resultMap>
+
+    <select id="findById" resultMap="resultList">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        FROM TRS_SEDE_PERSONA SP
+        WHERE  SP.SEDE_PERSONA_ID=#{sedePersonaId}
+        AND SP.ACTIVO=1
+    </select>
+    
+
+    <insert id="save"  parameterType="pe.gob.minjus.sisarb.model.domain.SedePersona">
+        <selectKey keyProperty="sedePersonaId" order="BEFORE" resultType="java.lang.Integer">
+            SELECT SEQ_TRS_SEDE_PERSONA.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TRS_SEDE_PERSONA (<include refid="columnsInsert" />) values
+        (
+        #{sedePersonaId, jdbcType=INTEGER},
+        #{sedeId, jdbcType=INTEGER},
+        #{personaId, jdbcType=INTEGER},
+        #{personaCargoId, jdbcType=INTEGER},
+        1,
+        TRIM(UPPER(#{auditUsuarioCreacion,jdbcType=VARCHAR})),
+        sysdate
+        )
+    </insert>
+
+    <update id="update" parameterType="pe.gob.minjus.sisarb.model.domain.SedePersona">
+        UPDATE TRS_SEDE_PERSONA
+        SET
+        AUDIT_FECHA_MODIFICA = sysdate,
+        <if test="sedeId != null">SEDE_ID =#{sedeId, jdbcType=INTEGER},</if>
+        AUDIT_USUARIO_MODIFICA = TRIM(UPPER(#{auditUsuarioModifica,jdbcType=VARCHAR}))
+        where SEDE_PERSONA_ID=#{sedePersonaId, jdbcType=INTEGER}
+    </update>
+
+    <update id="deleteById">
+        UPDATE TRS_SEDE_PERSONA
+        SET
+        AUDIT_FECHA_MODIFICA = sysdate,
+        AUDIT_USUARIO_MODIFICA = TRIM(UPPER(#{auditUsuarioModifica,jdbcType=VARCHAR})),
+        ACTIVO=0
+        where SEDE_PERSONA_ID=#{sedePersonaId, jdbcType=INTEGER}
+    </update>
+
+    <select id="findBySedePersonaCargo" resultMap="resultList">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        FROM TRS_SEDE_PERSONA SP
+        WHERE  SP.SEDE_ID=#{sedeId} AND SP.PERSONA_ID =#{personaId} AND SP.PERSONA_CARGO_ID=#{personaCargoId}
+        AND SP.ACTIVO=1
+    </select>
+
+
+
+</mapper>

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pe.gob.minjus.sisarb.model.mapper.SedeMapper">
+
+    <sql id="columnsSelect">
+        SEDE_ID,
+        INSTITUCION_ID,
+        NOMBRE,
+        DIRECCION,
+        NUMERO_RESOLUCION_PARTIDA,
+        TELEFONO,
+        CORREO,
+        UBIGEO_ID,
+        AUDIT_USUARIO_CREACION,
+        AUDIT_FECHA_CREACION,
+        AUDIT_USUARIO_MODIFICA,
+        AUDIT_FECHA_MODIFICA,
+
+        TO_CHAR(AUDIT_FECHA_CREACION, 'dd/mm/yyyy hh24:mi')  AUDIT_FECHA_CREACION_FORMAT,
+        TO_CHAR(AUDIT_FECHA_MODIFICA, 'dd/mm/yyyy hh24:mi') AUDIT_FECHA_MODIFICA_FORMAT
+    </sql>
+
+    <sql id="columnsInsert">
+        SEDE_ID,
+        INSTITUCION_ID,
+        NOMBRE,
+        DIRECCION,
+        NUMERO_RESOLUCION_PARTIDA,
+        TELEFONO,
+        CORREO,
+        UBIGEO_ID,
+        ACTIVO,
+        AUDIT_USUARIO_CREACION,
+        AUDIT_FECHA_CREACION
+    </sql>
+
+
+    <resultMap id="resultlistPaginated" type="pe.gob.minjus.sisarb.model.domain.Sede">
+        <id  property="sedeId"                          column="SEDE_ID"  />
+        <result property="institucionId"                column="INSTITUCION_ID" />
+        <result property="nombre"                       column="NOMBRE" />
+        <result property="direccion"                    column="DIRECCION" />
+        <result property="numeroResolucionPartida"      column="NUMERO_RESOLUCION_PARTIDA" />
+        <result property="telefono"                     column="TELEFONO" />
+        <result property="correo"                       column="CORREO" />
+        <result property="ubigeoId"                       column="UBIGEO_ID" />
+        <result property="auditUsuarioCreacion"         column="AUDIT_USUARIO_CREACION" />
+        <result property="auditFechaCreacion"           column="AUDIT_FECHA_CREACION" />
+        <result property="auditUsuarioModifica"         column="AUDIT_USUARIO_MODIFICA" />
+        <result property="auditFechaModifica"           column="AUDIT_FECHA_MODIFICA" />
+        <result property="auditFechaCreacionFormat"     column="AUDIT_FECHA_CREACION_FORMAT" />
+        <result property="auditFechaModificaFormat"     column="AUDIT_FECHA_MODIFICA_FORMAT" />
+    </resultMap>
+
+    <select id="listPaginated" resultMap="resultlistPaginated" parameterType="pe.gob.minjus.sisarb.model.request.SedeBusquedaRequest">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        FROM TRS_SEDE
+        <include refid="listPaginatedWhere">
+            <property name="nombre" value="nombre"/> 
+        </include>
+        OFFSET #{filaInicio,jdbcType=INTEGER} ROWS FETCH NEXT #{cantidadPorPagina,jdbcType=INTEGER} ROWS ONLY
+    </select>
+
+    <sql id="listPaginatedWhere">
+        WHERE ACTIVO=1
+        <if test="institucionId!=null"> AND INSTITUCION_ID=#{institucionId} </if>
+        <if test="nombre != null and nombre!=''"> AND NOMBRE  LIKE '%'|| REGEXP_REPLACE(TRIM(UPPER(#{nombre})), ' +', ' ')||'%' </if>
+    </sql>
+
+    <!-- Query para calcular el total -->
+    <select id="listPaginatedTotal" resultType="java.lang.Integer" parameterType="pe.gob.minjus.sisarb.model.request.SedeBusquedaRequest">
+        select count(1) total FROM TRS_SEDE
+        <include refid="listPaginatedWhere">
+            <property name="nombre" value="nombre"/>
+        </include>
+    </select>
+
+    <insert id="save"  parameterType="pe.gob.minjus.sisarb.model.domain.Sede">
+        <selectKey keyProperty="sedeId" order="BEFORE" resultType="java.lang.Integer">
+            SELECT SEQ_TRS_SEDE.NEXTVAL FROM DUAL
+        </selectKey>
+
+        INSERT INTO TRS_SEDE (<include refid="columnsInsert" />) values
+        (
+        #{sedeId, jdbcType=INTEGER},
+        #{institucionId, jdbcType=INTEGER},
+        REGEXP_REPLACE(TRIM(UPPER(#{nombre, jdbcType=VARCHAR})), ' +', ' '),
+        REGEXP_REPLACE(TRIM(UPPER(#{direccion, jdbcType=VARCHAR})), ' +', ' '),
+        REGEXP_REPLACE(TRIM(UPPER(#{numeroResolucionPartida, jdbcType=VARCHAR})), ' +', ' '),
+        REGEXP_REPLACE(TRIM(UPPER(#{telefono, jdbcType=VARCHAR})), ' +', ' '),
+        REGEXP_REPLACE(TRIM(UPPER(#{correo, jdbcType=VARCHAR})), ' +', ' '),
+        REGEXP_REPLACE(TRIM(UPPER(#{ubigeoId, jdbcType=VARCHAR})), ' +', ' '),
+        1,
+        TRIM(UPPER(#{auditUsuarioCreacion,jdbcType=VARCHAR})),
+        sysdate)
+    </insert>
+
+    <update id="update" parameterType="pe.gob.minjus.sisarb.model.domain.Sede">
+        UPDATE TRS_SEDE
+        SET
+        AUDIT_FECHA_MODIFICA=sysdate
+        <if test="institucionId != null">,INSTITUCION_ID =#{institucionId, jdbcType=INTEGER} </if>
+        <if test="nombre != null and nombre!=''">,NOMBRE =REGEXP_REPLACE(TRIM(UPPER(#{nombre, jdbcType=VARCHAR})), ' +', ' ') </if>
+        <if test="direccion != null and direccion!=''">,DIRECCION =REGEXP_REPLACE(TRIM(UPPER(#{direccion, jdbcType=VARCHAR})), ' +', ' ') </if>
+        <if test="numeroResolucionPartida != null and numeroResolucionPartida!=''">,NUMERO_RESOLUCION_PARTIDA =REGEXP_REPLACE(TRIM(UPPER(#{numeroResolucionPartida, jdbcType=VARCHAR})), ' +', ' ') </if>
+        <if test="telefono != null and telefono!=''">,TELEFONO =REGEXP_REPLACE(TRIM(UPPER(#{telefono, jdbcType=VARCHAR})), ' +', ' ') </if>
+        <if test="correo != null and correo!=''">,CORREO =REGEXP_REPLACE(TRIM(UPPER(#{correo, jdbcType=VARCHAR})), ' +', ' ') </if>
+        <if test="ubigeoId != null and ubigeoId!=''">,UBIGEO_ID =REGEXP_REPLACE(TRIM(UPPER(#{ubigeoId, jdbcType=VARCHAR})), ' +', ' ') </if>
+        <if test="auditUsuarioModifica != null and auditUsuarioModifica!=''">, AUDIT_USUARIO_MODIFICA=TRIM(UPPER(#{auditUsuarioModifica, jdbcType=VARCHAR})) </if>
+        where SEDE_ID=#{sedeId, jdbcType=INTEGER}
+    </update>
+
+    <select id="findById" resultMap="resultlistPaginated" parameterType="java.lang.Integer">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        FROM TRS_SEDE
+        WHERE ACTIVO=1 AND SEDE_ID = #{id, jdbcType=INTEGER}
+    </select>
+
+    <update id="deleteById" parameterType="java.lang.Integer">
+        UPDATE TRS_SEDE
+        SET
+        ACTIVO=0
+        where SEDE_ID=#{id, jdbcType=INTEGER}
+    </update>
+
+    <sql id="columnsSelectChoose">
+        SEDE_ID,
+        NOMBRE
+    </sql>
+
+    <select id="listChoose" resultMap="resultlistPaginated">
+        SELECT
+        <include refid="columnsSelectChoose">
+        </include>
+        FROM TRS_SEDE WHERE ACTIVO=1
+    </select>
+
+
+    <select id="countNombreSedeByInstitucion" resultType="java.lang.Integer"  >
+        SELECT
+        COUNT(1)
+        FROM TRS_SEDE SE
+        WHERE
+        ACTIVO = 1
+        AND INSTITUCION_ID =#{institucionId}
+        AND NOMBRE = REGEXP_REPLACE(TRIM(UPPER(#{nombreSede})), ' +', ' ')
+    </select>
+
+    <select id="countNombreSedeByInstitucionAndExcludeSede" resultType="java.lang.Integer"  >
+        SELECT
+        COUNT(1)
+        FROM TRS_SEDE SE
+        WHERE
+        ACTIVO = 1
+        AND INSTITUCION_ID =#{institucionId}
+        AND NOMBRE = REGEXP_REPLACE(TRIM(UPPER(#{nombreSede})), ' +', ' ')
+        AND SEDE_ID != #{sedeId}
+    </select>
+</mapper>

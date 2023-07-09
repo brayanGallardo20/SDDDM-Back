@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="pe.gob.minjus.sisarb.model.mapper.TarifaMapper">
+
+	<sql id="columnsSelect">
+		TARIFA_ID,
+		INSTITUCION_ID,
+		HONORARIO_PAGAR_PARTE,
+		HONORARIO_ARBITRO,
+		CUANTIA_DESDE,
+		CUANTIA_HASTA,
+		ACTIVO,
+		AUDIT_USUARIO_CREACION,
+		AUDIT_FECHA_CREACION,
+		AUDIT_USUARIO_MODIFICA,
+		AUDIT_FECHA_MODIFICA,
+		TO_CHAR(AUDIT_FECHA_CREACION, 'yyyy-mm-dd hh24:mi')
+		AUDIT_FECHA_CREACION_FORMAT,
+		TO_CHAR(AUDIT_FECHA_MODIFICA, 'yyyy-mm-dd
+		hh24:mi')
+		AUDIT_FECHA_MODIFICA_FORMAT
+	</sql>
+
+	<sql id="columnsSelectTarifa">
+		TARIFA_ID,
+		INSTITUCION_ID,
+		HONORARIO_PAGAR_PARTE,
+		HONORARIO_ARBITRO,
+		CUANTIA_DESDE,
+		CUANTIA_HASTA,
+		AUDIT_USUARIO_CREACION,
+		AUDIT_FECHA_CREACION,
+		AUDIT_USUARIO_MODIFICA,
+		AUDIT_FECHA_MODIFICA,
+		TO_CHAR(AUDIT_FECHA_CREACION, 'yyyy-mm-dd hh24:mi')
+		AUDIT_FECHA_CREACION_FORMAT,
+		TO_CHAR(AUDIT_FECHA_MODIFICA, 'yyyy-mm-dd
+		hh24:mi')
+		AUDIT_FECHA_MODIFICA_FORMAT
+	</sql>
+
+
+	<sql id="columnsInsert">
+		TARIFA_ID,
+		INSTITUCION_ID,
+		HONORARIO_PAGAR_PARTE,
+		HONORARIO_ARBITRO,
+		CUANTIA_DESDE,
+		CUANTIA_HASTA,
+		AUDIT_USUARIO_CREACION,
+		AUDIT_FECHA_CREACION,
+		ACTIVO
+	</sql>
+
+	<resultMap id="resultlistPaginated"
+		type="pe.gob.minjus.sisarb.model.response.TarifaResponse">
+		<id property="tarifaId" column="TARIFA_ID" />
+		<result property="institucionId" column="INSTITUCION_ID" />
+		<result property="honorarioPagarParte"
+			column="HONORARIO_PAGAR_PARTE" />
+		<result property="honorarioArbitro" column="HONORARIO_ARBITRO" />
+		<result property="cuantiaDesde" column="CUANTIA_DESDE" />
+		<result property="cuantiaHasta" column="CUANTIA_HASTA" />
+		<result property="activo" column="ACTIVO" />
+		<result property="auditUsuarioCreacion"
+			column="AUDIT_USUARIO_CREACION" />
+		<result property="auditFechaCreacion"
+			column="AUDIT_FECHA_CREACION" />
+		<result property="auditUsuarioModifica"
+			column="AUDIT_USUARIO_MODIFICA" />
+		<result property="auditFechaModifica"
+			column="AUDIT_FECHA_MODIFICA" />
+		<result property="auditFechaCreacionFormat"
+			column="AUDIT_FECHA_CREACION_FORMAT" />
+		<result property="auditFechaModificaFormat"
+			column="AUDIT_FECHA_MODIFICA_FORMAT" />
+	</resultMap>
+
+<resultMap id="resultListTarifa" type="pe.gob.minjus.sisarb.model.domain.Tarifa">
+       		<id property="tarifaId" column="TARIFA_ID" />
+		<result property="institucionId" column="INSTITUCION_ID" />
+		<result property="honorarioPagarParte"
+			column="HONORARIO_PAGAR_PARTE" />
+		<result property="honorarioArbitro" column="HONORARIO_ARBITRO" />
+		<result property="cuantiaDesde" column="CUANTIA_DESDE" />
+		<result property="cuantiaHasta" column="CUANTIA_HASTA" />
+		<result property="activo" column="ACTIVO" />
+		<result property="auditUsuarioCreacion"
+			column="AUDIT_USUARIO_CREACION" />
+		<result property="auditFechaCreacion"
+			column="AUDIT_FECHA_CREACION" />
+		<result property="auditUsuarioModifica"
+			column="AUDIT_USUARIO_MODIFICA" />
+		<result property="auditFechaModifica"
+			column="AUDIT_FECHA_MODIFICA" />
+		<result property="auditFechaCreacionFormat"
+			column="AUDIT_FECHA_CREACION_FORMAT" />
+		<result property="auditFechaModificaFormat"
+			column="AUDIT_FECHA_MODIFICA_FORMAT" />          
+    </resultMap>  
+    
+	<select id="listPaginated" resultMap="resultlistPaginated"
+		parameterType="pe.gob.minjus.sisarb.model.request.TarifaBusquedaRequest">
+		SELECT
+		<include refid="columnsSelect">
+		</include>
+		FROM TRS_TARIFA
+		<include refid="listPaginatedWhere">
+			<property name="institucionId" value="institucionId" />
+			<property name="cuantiaDesde" value="cuantiaDesde" />
+		</include>
+		OFFSET #{filaInicio,jdbcType=INTEGER} ROWS FETCH NEXT
+		#{cantidadPorPagina,jdbcType=INTEGER} ROWS ONLY
+	</select>
+
+	<resultMap id="resultFind"
+		type="pe.gob.minjus.sisarb.model.domain.Tarifa">
+		<result property="institucionId" column="institucionId" />
+	</resultMap>
+
+	<sql id="listPaginatedWhere">
+		WHERE ACTIVO=1
+		<if test="institucionId!=null and institucionId!=''"> AND INSTITUCION_ID = #{institucionId} </if>
+		<if test="cuantiaDesde!=null and cuantiaDesde!=''"> AND TRIM(UPPER(CUANTIA_DESDE)) LIKE '%'||TRIM(UPPER(#{cuantiaDesde}))||'%' </if>
+	</sql>
+
+	<!-- Query para calcular el total -->
+	<select id="listPaginatedTotal" resultType="java.lang.Integer"
+		parameterType="pe.gob.minjus.sisarb.model.request.TarifaBusquedaRequest">
+		select count(1) total FROM TRS_TARIFA
+		<include refid="listPaginatedWhere">
+			<property name="institucionId" value="institucionId" />
+			<property name="cuantiaDesde" value="cuantiaDesde" />
+		</include>
+	</select>
+
+	<update id="update"
+		parameterType="pe.gob.minjus.sisarb.model.domain.Tarifa">
+		update TRS_TARIFA
+		set
+		HONORARIO_PAGAR_PARTE =
+		#{honorarioPagarParte},
+		HONORARIO_ARBITRO = #{honorarioArbitro} ,
+		CUANTIA = #{cuantia},
+		CUANTIA_DESDE = #{cuantiaDesde},
+		CUANTIA_HASTA = #{cuantiaHasta},
+		AUDIT_FECHA_MODIFICA= SYSDATE,
+		AUDIT_USUARIO_MODIFICA=TRIM(UPPER(#{auditUsuarioModifica,
+		jdbcType=VARCHAR}))
+		where TARIFA_ID=#{tarifaId}
+	</update>
+
+	<insert id="insert"
+		parameterType="pe.gob.minjus.sisarb.model.domain.Tarifa">
+
+		<selectKey keyProperty="tarifaId" order="BEFORE"
+			resultType="java.lang.Integer">
+			SELECT SEQ_TRS_TARIFA.NEXTVAL FROM DUAL
+		</selectKey>
+
+		insert into TRS_TARIFA (
+		<include refid="columnsInsert" />
+		) values
+		(
+		#{tarifaId, jdbcType=NUMERIC},
+		#{institucionId,
+		jdbcType=VARCHAR},
+		#{honorarioPagarParte, jdbcType=VARCHAR} ,
+		#{honorarioArbitro, jdbcType=VARCHAR} ,
+		#{cuantiaDesde, jdbcType=VARCHAR} ,
+		#{cuantiaHasta, jdbcType=VARCHAR} ,	
+		UPPER(#{auditUsuarioCreacion, jdbcType=VARCHAR}),
+		SYSDATE,
+		1
+		)
+	</insert>
+
+	<update id="delete" parameterType="java.lang.Integer">
+		update TRS_TARIFA
+		set
+		ACTIVO =
+		0,
+		AUDIT_FECHA_MODIFICA= SYSDATE,
+		AUDIT_USUARIO_MODIFICA=TRIM(UPPER(#{auditUsuarioModifica,
+		jdbcType=VARCHAR}))
+		where TARIFA_ID = '${tarifaId}'
+	</update>
+
+	<select id="findById" resultMap="resultListTarifa"
+		parameterType="java.lang.Integer">
+		SELECT
+		<include refid="columnsSelectTarifa">
+		</include>
+		FROM TRS_TARIFA
+		WHERE ACTIVO=1 AND TARIFA_ID = #{tarifaId,
+		jdbcType=INTEGER}
+	</select>
+
+</mapper>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="pe.gob.minjus.sisarb.model.mapper.UbigeoMapper">
+
+	<sql id="columnsSelect">
+		UBIGEO_ID,
+		ORIGEN,
+		TIPO,
+		DESCRIPCION,
+		UBIGEO,
+		UBIGEO_PADRE_ID,
+		ESTADO_REGISTRO,
+		FECHA_CREACION,
+		USUARIO_CREACION,
+		USUARIO_MODIFICACION,
+		FECHA_MODIFICACION
+	</sql>
+
+	<resultMap id="resultListBusquedaUbigeo"
+		type="pe.gob.minjus.sisarb.model.domain.UbigeoItem">
+		<result property="ubigeoId" column="UBIGEO_ID" />
+		<result property="origen" column="ORIGEN" />
+		<result property="tipo" column="TIPO" />
+		<result property="descripcion" column="DESCRIPCION" />
+		<result property="ubigeo" column="UBIGEO" />
+		<result property="ubigeoPadreId" column="UBIGEO_PADRE_ID" />
+		<result property="estadoRegistro" column="ESTADO_REGISTRO" />
+		<result property="fechaCreacion" column="FECHA_CREACION" />
+		<result property="usuarioCreacion" column="USUARIO_CREACION" />
+		<result property="usuarioModificacion" column="USUARIO_MODIFICACION" />
+		<result property="fechaModificacion" column="FECHA_MODIFICACION" />
+	</resultMap>
+
+	<sql id="listBusquedaUbigeoWhere">
+		WHERE 1=1
+		AND ESTADO_REGISTRO = 1 
+		<if test="ubigeoPadreId==null"> AND UBIGEO_PADRE_ID IS NULL </if>
+		<if test="ubigeoPadreId!=null"> AND UBIGEO_PADRE_ID=#{ubigeoPadreId} </if>	
+		 AND ORIGEN =  UPPER(#{origen})
+	</sql>
+
+	<select id="getUbigeoList" resultMap="resultListBusquedaUbigeo"
+		parameterType="map">
+		SELECT
+		<include refid="columnsSelect">
+		</include>
+		FROM MAE_UBIGEO
+		<include refid="listBusquedaUbigeoWhere">
+			<property name="ubigeoPadreId" value="ubigeoPadreId" />
+			<property name="origen" value="origen" />
+		</include>
+	</select>
+
+
+	<select id="getUbigeoPorId" resultMap="resultListBusquedaUbigeo"
+			parameterType="map">
+		SELECT
+		<include refid="columnsSelect">
+		</include>
+		FROM MAE_UBIGEO
+		WHERE ESTADO_REGISTRO = 1
+		AND UBIGEO_ID = #{ubigeoId}
+		AND ORIGEN =  UPPER(#{origen})
+	</select>
+
+</mapper>

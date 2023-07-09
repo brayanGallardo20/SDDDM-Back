@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pe.gob.minjus.sisarb.model.mapper.DirectivoMapper">
+
+    <sql id="columnsSelect">
+        tip.INSTITUCION_PERSONA_ID,
+        mtd.NOMBRE,
+        tp.NUMERO_DOCUMENTO,
+        tp.PRIMER_APELLIDO,
+        tp.SEGUNDO_APELLIDO,
+        tp.PERSONA_ID,
+        tp.NOMBRES,
+        tp.TIPO_DOCUMENTO_ID,
+        tp.audit_usuario_creacion,
+        tp.audit_fecha_creacion,
+        tp.audit_usuario_modifica,
+        tp.audit_fecha_modifica,
+        TO_CHAR(tip.AUDIT_FECHA_CREACION, 'dd/mm/yyyy hh24:mi')  AUDIT_FECHA_CREACION_FORMAT,
+        TO_CHAR(tip.AUDIT_FECHA_MODIFICA, 'dd/mm/yyyy hh24:mi') AUDIT_FECHA_MODIFICA_FORMAT
+    </sql>
+
+
+    <sql id="columnsSelectDirectivo">
+        INSTITUCION_PERSONA_ID,
+        PERSONA_ID,
+        INSTITUCION_ID,
+        audit_usuario_creacion,
+        audit_fecha_creacion,
+        audit_usuario_modifica,
+        audit_fecha_modifica,
+        TO_CHAR(AUDIT_FECHA_CREACION, 'dd/mm/yyyy hh24:mi')  AUDIT_FECHA_CREACION_FORMAT,
+        TO_CHAR(AUDIT_FECHA_MODIFICA, 'dd/mm/yyyy hh24:mi') AUDIT_FECHA_MODIFICA_FORMAT
+    </sql>
+
+
+        <sql id="columnsSelectPersona">
+        tp.PERSONA_ID,
+        tp.NUMERO_DOCUMENTO,
+        tp.PRIMER_APELLIDO,
+        tp.SEGUNDO_APELLIDO,
+        tp.NOMBRES,
+        tp.TIPO_DOCUMENTO_ID,
+        tp.audit_usuario_creacion,
+        tp.audit_fecha_creacion,
+        tp.audit_usuario_modifica,
+        tp.audit_fecha_modifica,
+        TO_CHAR(tp.AUDIT_FECHA_CREACION, 'dd/mm/yyyy hh24:mi')  AUDIT_FECHA_CREACION_FORMAT,
+        TO_CHAR(tp.AUDIT_FECHA_MODIFICA, 'dd/mm/yyyy hh24:mi') AUDIT_FECHA_MODIFICA_FORMAT
+    </sql>
+
+    <sql id="columnsInsert">
+        persona_id,nombres,primer_apellido,segundo_apellido,numero_Documento,correo,telefono,direccion,tipo_Documento_Id,
+        audit_usuario_creacion,audit_fecha_creacion,activo
+    </sql>
+
+    <sql id="columnsInsertInstitutoPersona">
+        institucion_persona_id,institucion_id,persona_id,persona_cargo_id,activo, audit_usuario_creacion,audit_fecha_creacion
+    </sql>
+
+    <resultMap id="resultListBusqueda" type="pe.gob.minjus.sisarb.model.domain.Directivo">
+        <id  property="institucionPersonaId"   column="INSTITUCION_PERSONA_ID"  />
+        <result property="nombre"   column="NOMBRES"  />
+        <result property="numeroDocumento"   column="NUMERO_DOCUMENTO"  />
+        <result property="tipoDocumento"   column="NOMBRE"  />
+        <result property="personaNaturalId"   column="PERSONA_ID"  />
+        <result property="apellidoPaterno"            column="PRIMER_APELLIDO" />
+        <result property="apellidoMaterno"            column="SEGUNDO_APELLIDO" />
+        <result property="tipoDocumentoId"            column="TIPO_DOCUMENTO_ID" />
+        <result property="auditUsuarioCreacion"            column="AUDIT_USUARIO_CREACION" />
+        <result property="auditFechaCreacion"            column="AUDIT_FECHA_CREACION" />
+        <result property="auditUsuarioModifica"            column="AUDIT_USUARIO_MODIFICA" />
+        <result property="auditFechaModifica"            column="AUDIT_FECHA_MODIFICA" />
+        <result property="auditFechaCreacionFormat"            column="AUDIT_FECHA_CREACION_FORMAT" />
+        <result property="auditFechaModificaFormat"            column="AUDIT_FECHA_MODIFICA_FORMAT" />
+    </resultMap>
+
+    <resultMap id="resultListBusquedaDirectivo" type="pe.gob.minjus.sisarb.model.domain.Directivo">
+        <id  property="institucionPersonaId"   column="INSTITUCION_PERSONA_ID"  />
+        <result property="institucionId"   column="INSTITUCION_ID"  />
+        <result property="personaNaturalId"   column="PERSONA_ID"  />
+        <result property="auditUsuarioCreacion"            column="AUDIT_USUARIO_CREACION" />
+        <result property="auditFechaCreacion"            column="AUDIT_FECHA_CREACION" />
+        <result property="auditUsuarioModifica"            column="AUDIT_USUARIO_MODIFICA" />
+        <result property="auditFechaModifica"            column="AUDIT_FECHA_MODIFICA" />
+        <result property="auditFechaCreacionFormat"            column="AUDIT_FECHA_CREACION_FORMAT" />
+        <result property="auditFechaModificaFormat"            column="AUDIT_FECHA_MODIFICA_FORMAT" />
+    </resultMap>
+
+    <resultMap id="resultListBusquedaPersona" type="pe.gob.minjus.sisarb.model.domain.PersonaNatural">
+        <id  property="institucionPersonaId"   column="INSTITUCION_PERSONA_ID"  />
+        <result  property="nombre"   column="NOMBRES"  />
+        <result  property="numeroDocumento"   column="NUMERO_DOCUMENTO"  />
+        <result  property="personaNaturalId"   column="PERSONA_ID"  />
+        <result property="apellidoPaterno"            column="PRIMER_APELLIDO" />
+        <result property="apellidoMaterno"            column="SEGUNDO_APELLIDO" />
+        <result property="tipoDocumentoId"            column="TIPO_DOCUMENTO_ID" />
+        <result property="auditUsuarioCreacion"            column="AUDIT_USUARIO_CREACION" />
+        <result property="auditFechaCreacion"            column="AUDIT_FECHA_CREACION" />
+        <result property="auditUsuarioModifica"            column="AUDIT_USUARIO_MODIFICA" />
+        <result property="auditFechaModifica"            column="AUDIT_FECHA_MODIFICA" />
+        <result property="auditFechaCreacionFormat"            column="AUDIT_FECHA_CREACION_FORMAT" />
+        <result property="auditFechaModificaFormat"            column="AUDIT_FECHA_MODIFICA_FORMAT" />
+    </resultMap>
+
+    <select id="listBusqueda" resultMap="resultListBusqueda" parameterType="pe.gob.minjus.sisarb.model.request.DirectivoBusquedaRequest">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        FROM TRS_PERSONA tp INNER JOIN MAE_TIPO_DOCUMENTO mtd ON tp.TIPO_DOCUMENTO_ID = mtd.TIPO_DOCUMENTO_ID  INNER JOIN TRS_INSTITUCION_PERSONA tip ON tip.PERSONA_ID = tp.PERSONA_ID
+        <include refid="listBusquedaWhere">
+            <property name="tipoDocumentoId" value="tipoDocumentoId"/>
+            <property name="numeroDocumento" value="numeroDocumento"/>
+            <property name="institucionId" value="institucionId"/>
+        </include>
+        OFFSET #{filaInicio,jdbcType=INTEGER} ROWS FETCH NEXT #{cantidadPorPagina,jdbcType=INTEGER} ROWS ONLY
+    </select>
+
+    <sql id="listBusquedaWhere">
+        WHERE tp.activo = 1 and  tip.activo = 1 and tip.persona_cargo_id = 102
+        <if test="institucionId!=null and institucionId!=''"> AND tip.institucion_id = #{institucionId} </if>
+        <if test="tipoDocumentoId!=null and tipoDocumentoId!=''"> AND tp.tipo_documento_id = #{tipoDocumentoId} </if>
+        <if test="numeroDocumento!=null and numeroDocumento!=''"> AND UPPER(tp.NUMERO_DOCUMENTO) LIKE '%'||UPPER(#{numeroDocumento})||'%' </if>
+    </sql>
+
+    <!-- Query para calcular el total -->
+    <select id="listBusquedaTotal" resultType="java.lang.Integer" parameterType="pe.gob.minjus.sisarb.model.request.DirectivoBusquedaRequest">
+        select count(1) total FROM TRS_PERSONA tp INNER JOIN MAE_TIPO_DOCUMENTO mtd ON tp.TIPO_DOCUMENTO_ID = mtd.TIPO_DOCUMENTO_ID  INNER JOIN TRS_INSTITUCION_PERSONA tip ON tip.PERSONA_ID = tp.PERSONA_ID
+        <include refid="listBusquedaWhere">
+            <property name="tipoDocumentoId" value="tipoDocumentoId"/>
+            <property name="numeroDocumento" value="numeroDocumento"/>
+            <property name="institucionId" value="institucionId"/>
+        </include>
+    </select>
+
+
+    <insert id="insertPersona"  parameterType="pe.gob.minjus.sisarb.model.domain.PersonaNatural">
+        <selectKey keyProperty="personaNaturalId" order="BEFORE" resultType="java.lang.Integer">
+            SELECT SEQ_TRS_PERSONA.NEXTVAL FROM DUAL
+        </selectKey>
+
+        insert into TRS_PERSONA (<include refid="columnsInsert" />) values
+        (
+        #{personaNaturalId, jdbcType=NUMERIC},
+        REGEXP_REPLACE(TRIM(UPPER(#{nombre, jdbcType=VARCHAR})), ' +', ' '),
+        REGEXP_REPLACE(TRIM(UPPER(#{apellidoPaterno, jdbcType=VARCHAR})), ' +', ' '),
+        REGEXP_REPLACE(TRIM(UPPER(#{apellidoMaterno, jdbcType=VARCHAR})), ' +', ' '),
+        REGEXP_REPLACE(TRIM(UPPER(#{numeroDocumento, jdbcType=VARCHAR})), ' +', ' '),
+        REGEXP_REPLACE(TRIM(UPPER(#{correo, jdbcType=VARCHAR})), ' +', ' '),
+        REGEXP_REPLACE(TRIM(UPPER(#{telefono, jdbcType=VARCHAR})), ' +', ' '),
+        REGEXP_REPLACE(TRIM(UPPER(#{direccion, jdbcType=VARCHAR})), ' +', ' '),
+        #{tipoDocumentoId, jdbcType=NUMERIC},
+        UPPER(#{auditUsuarioCreacion,jdbcType=VARCHAR}),
+        sysdate,
+        1)
+    </insert>
+
+    <insert id="insertInstitutoPersona"  parameterType="pe.gob.minjus.sisarb.model.domain.InstitucionPersona">
+        <selectKey keyProperty="institucionPersonaId" order="BEFORE" resultType="java.lang.Integer">
+            SELECT SEQ_TRS_INSTITUCION_PERSONA.NEXTVAL FROM DUAL
+        </selectKey>
+
+        insert into TRS_INSTITUCION_PERSONA (<include refid="columnsInsertInstitutoPersona" />) values
+        (
+        #{institucionPersonaId, jdbcType=NUMERIC},
+        #{institucionId, jdbcType=NUMERIC},
+        #{personaId, jdbcType=NUMERIC},
+        #{personaCargoId, jdbcType=NUMERIC},
+        1,
+        UPPER(#{auditUsuarioCreacion,jdbcType=VARCHAR}),
+        sysdate)
+    </insert>
+
+    <update id="updateInstitutoPersona" parameterType="pe.gob.minjus.sisarb.model.domain.InstitucionPersona">
+        update TRS_INSTITUCION_PERSONA
+        set
+        persona_id = #{personaId, jdbcType=NUMERIC}
+        ,audit_fecha_modifica=sysdate
+        ,audit_usuario_modifica=UPPER(#{auditUsuarioModifica, jdbcType=VARCHAR})
+        where institucion_persona_id=#{institucionPersonaId, jdbcType=NUMERIC}
+    </update>
+
+    <update id="update" parameterType="pe.gob.minjus.sisarb.model.domain.PersonaNatural">
+        update TRS_PERSONA
+        set
+        audit_fecha_modifica=sysdate
+        <if test="tipoDocumentoId != null">, tipo_documento_id=UPPER(#{tipoDocumentoId, jdbcType=NUMERIC}) </if>
+        <if test="numeroDocumento != null and numeroDocumento!=''">, numero_documento=UPPER(#{numeroDocumento, jdbcType=VARCHAR}) </if>
+        <if test="apellidoPaterno != null and apellidoPaterno!=''">, primer_apellido=UPPER(#{apellidoPaterno, jdbcType=VARCHAR}) </if>
+        <if test="apellidoMaterno != null and apellidoMaterno!=''">, segundo_apellido=UPPER(#{apellidoMaterno, jdbcType=VARCHAR}) </if>
+        <if test="nombre != null and nombre!=''">, nombres=UPPER(#{nombre, jdbcType=VARCHAR}) </if>
+        where persona_id=#{personaNaturalId, jdbcType=NUMERIC}
+    </update>
+
+    <select id="findByIdDirectivo" resultMap="resultListBusquedaDirectivo" parameterType="pe.gob.minjus.sisarb.model.domain.Directivo">
+        SELECT
+        <include refid="columnsSelectDirectivo">
+        </include>
+        FROM TRS_INSTITUCION_PERSONA
+        WHERE institucion_persona_id = #{institucionPersonaId}
+    </select>
+
+    <select id="findByIdPersona" resultMap="resultListBusquedaPersona" parameterType="pe.gob.minjus.sisarb.model.domain.Directivo">
+        SELECT
+        <include refid="columnsSelectPersona">
+        </include>
+        FROM TRS_PERSONA tp
+        WHERE persona_id = #{personaNaturalId}
+    </select>
+
+
+    <select id="findByIdInstitutePerson" resultMap="resultListBusqueda" parameterType="java.lang.Integer">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        FROM TRS_PERSONA tp INNER JOIN MAE_TIPO_DOCUMENTO mtd ON tp.TIPO_DOCUMENTO_ID = mtd.TIPO_DOCUMENTO_ID  LEFT JOIN TRS_INSTITUCION_PERSONA tip ON tip.PERSONA_ID = tp.PERSONA_ID
+        WHERE tip.persona_cargo_id = 102 and tip.institucion_persona_id = #{id, jdbcType=NUMERIC}
+    </select>
+
+    <select id="findPersonByIdPersonaInstitute" resultMap="resultListBusqueda" parameterType="java.lang.Integer">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        FROM TRS_PERSONA tp INNER JOIN MAE_TIPO_DOCUMENTO mtd ON tp.TIPO_DOCUMENTO_ID = mtd.TIPO_DOCUMENTO_ID  LEFT JOIN TRS_INSTITUCION_PERSONA tip ON tip.PERSONA_ID = tp.PERSONA_ID
+        WHERE tip.persona_cargo_id = 102 and tp.persona_id = #{id, jdbcType=NUMERIC} and tip.institucion_id =#{institucionId}
+    </select>
+
+    <update id="deleteById" parameterType="java.lang.Integer">
+        update TRS_INSTITUCION_PERSONA
+        set
+        ACTIVO = 0
+        where INSTITUCION_PERSONA_ID='${institucionPersonaId}'
+    </update>
+
+    <select id="findByDocumentNumber" resultMap="resultFind" parameterType="pe.gob.minjus.sisarb.model.domain.Directivo">
+        SELECT ti.PERSONA_ID
+        FROM TRS_INSTITUCION_PERSONA ti WHERE ti.PERSONA_ID IN(
+        SELECT PERSONA_ID FROM TRS_PERSONA tp WHERE
+        tp.TIPO_DOCUMENTO_ID = #{tipoDocumentoId}
+        AND tp.NUMERO_DOCUMENTO = #{numeroDocumento}
+        AND tp.ACTIVO = 1
+        ) AND ti.ACTIVO = 1 AND ti.persona_cargo_id = 102 and ti.institucion_id =#{institucionId}  AND ROWNUM = 1
+    </select>
+
+    <select id="countDirectivo" resultMap="resultFind" parameterType="pe.gob.minjus.sisarb.model.domain.Directivo">
+        SELECT ti.PERSONA_ID
+        FROM TRS_INSTITUCION_PERSONA ti WHERE ti.institucion_id =#{institucionId} AND  ti.ACTIVO = 1 AND ti.persona_cargo_id = 102  AND ROWNUM = 1
+    </select>
+
+    <select id="countDirectivoGlobal" resultMap="resultFind" parameterType="pe.gob.minjus.sisarb.model.domain.Directivo">
+        SELECT ti.PERSONA_ID
+        FROM TRS_INSTITUCION_PERSONA ti
+        WHERE ti.PERSONA_ID IN(
+        SELECT PERSONA_ID FROM TRS_PERSONA tp WHERE
+        tp.TIPO_DOCUMENTO_ID = #{tipoDocumentoId}
+        AND tp.NUMERO_DOCUMENTO = #{numeroDocumento}
+        AND tp.ACTIVO = 1
+        ) AND  ti.ACTIVO = 1 AND ti.persona_cargo_id in (102) AND ROWNUM = 1
+    </select>
+    
+    <select id="findByDocumentPersona" resultMap="resultListBusquedaPersona" parameterType="pe.gob.minjus.sisarb.model.domain.Directivo">
+        SELECT
+        <include refid="columnsSelectPersona">
+        </include>
+         FROM TRS_PERSONA tp WHERE
+        TIPO_DOCUMENTO_ID = #{tipoDocumentoId} AND NUMERO_DOCUMENTO = #{numeroDocumento} AND ACTIVO = 1
+    </select>
+
+    <resultMap id="resultFind" type="pe.gob.minjus.sisarb.model.domain.PersonaNatural">
+        <result property="personaNaturalId" column="PERSONA_ID" />
+    </resultMap>
+
+</mapper>

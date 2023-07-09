@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pe.gob.minjus.sisarb.model.mapper.SancionMapper">
+
+    <sql id="columnsSelect">
+        SANCION_ID,
+        NOMBRE,
+        AUDIT_USUARIO_CREACION,
+        AUDIT_FECHA_CREACION,
+        AUDIT_USUARIO_MODIFICA,
+        AUDIT_FECHA_MODIFICA,
+
+        TO_CHAR(AUDIT_FECHA_CREACION, 'yyyy-mm-dd')  AUDIT_FECHA_CREACION_FORMAT,
+        TO_CHAR(AUDIT_FECHA_MODIFICA, 'yyyy-mm-dd') AUDIT_FECHA_MODIFICA_FORMAT
+
+    </sql>
+
+
+    <resultMap id="resultSelect" type="pe.gob.minjus.sisarb.model.domain.Sancion">
+        <id  property="sancionId"   column="SANCION_ID"  />
+        <result property="nombre"            column="NOMBRE" />
+        <result property="auditUsuarioCreacion"            column="AUDIT_USUARIO_CREACION" />
+        <result property="auditFechaCreacion"            column="AUDIT_FECHA_CREACION" />
+        <result property="auditUsuarioModifica"            column="AUDIT_USUARIO_MODIFICA" />
+        <result property="auditFechaModifica"            column="AUDIT_FECHA_MODIFICA" />
+
+        <result property="auditFechaCreacionFormat"            column="AUDIT_FECHA_CREACION_FORMAT" />
+        <result property="auditFechaModificaFormat"            column="AUDIT_FECHA_MODIFICA_FORMAT" />
+    </resultMap>
+
+    <select id="list" resultMap="resultSelect"  >
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        FROM TRS_SANCION WHERE estado='1'
+    </select>
+
+
+
+</mapper>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pe.gob.minjus.sisarb.model.mapper.AuditoriaMapper">
+
+    <sql id="columnsSelect">
+        tabla,codigo,movimiento,audit_usuario,audit_fecha,
+        audit_tipo,valor_original,valor_final,
+        TO_CHAR(audit_fecha, 'yyyy-mm-dd hh24:mi') audit_fecha_format,
+        TO_CHAR(audit_fecha, 'yyyy-mm-dd hh24:mi:ss') audit_fecha_completa_format
+    </sql>
+    <sql id="columnsInsert">tabla,codigo,movimiento,audit_usuario,audit_fecha,audit_tipo,valor_original,valor_final</sql>
+
+    <resultMap id="resultlistPaginated" type="pe.gob.minjus.sisarb.model.domain.Auditoria">
+        <result property="tabla"            column="TABLA" />
+        <result property="codigo"           column="CODIGO" />
+        <result property="movimiento"       column="MOVIMIENTO" />
+        <result property="auditUsuario"     column="AUDIT_USUARIO" />
+        <result property="auditFecha"       column="AUDIT_FECHA" />
+        <result property="auditTipo"        column="AUDIT_TIPO" />
+        <result property="valorOriginal"    column="VALOR_ORIGINAL" />
+        <result property="valorFinal"       column="VALOR_FINAL" />
+
+        <result property="auditFechaFormat"       column="AUDIT_FECHA_FORMAT" />
+        <result property="auditFechaCompletaFormat"       column="AUDIT_FECHA_COMPLETA_FORMAT" />
+    </resultMap>
+
+    <select id="listPaginated" resultMap="resultlistPaginated" parameterType="pe.gob.minjus.sisarb.model.request.AuditoriaBusquedaRequest">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        FROM aud_auditoria
+        <include refid="listPaginatedWhere">
+            <property name="tabla" value="tabla"/>
+            <property name="auditTipo" value="auditTipo"/>
+            <property name="usuario" value="usuario"/>
+            <property name="auditFechaInicio" value="auditFechaInicio"/>
+            <property name="auditFechaFin" value="auditFechaFin"/>
+        </include>
+        OFFSET #{filaInicio,jdbcType=INTEGER} ROWS FETCH NEXT #{cantidadPorPagina,jdbcType=INTEGER} ROWS ONLY
+    </select>
+
+
+    <sql id="listPaginatedWhere">
+        WHERE 1=1
+        <if test="tabla!=null"> AND tabla=#{tabla} </if>
+        <if test="auditTipo!=null"> AND audit_tipo=UPPER(#{auditTipo}) </if>
+        <if test="usuario!=null and usuario!=''"> AND UPPER(audit_usuario) LIKE '%'||UPPER(#{usuario})||'%' </if>
+        <if test="auditFechaInicio!=null and auditFechaInicio!='' and auditFechaFin!=null and auditFechaFin!='' ">
+            AND (audit_fecha BETWEEN  TO_DATE( #{auditFechaInicio} ||' 00:00:00', 'DD/MM/YYYY hh24:mi:ss')
+            AND TO_DATE(#{auditFechaFin}||' 23:59:59', 'DD/MM/YYYY hh24:mi:ss'))
+        </if>
+    </sql>
+
+    <!-- Query para calcular el total -->
+    <select id="listPaginatedTotal" resultType="java.lang.Integer" parameterType="pe.gob.minjus.sisarb.model.request.AuditoriaBusquedaRequest">
+        select count(1) total FROM aud_auditoria
+        <include refid="listPaginatedWhere">
+            <property name="tabla" value="tabla"/>
+            <property name="auditTipo" value="auditTipo"/>
+            <property name="usuario" value="usuario"/>
+            <property name="auditFechaInicio" value="auditFechaInicio"/>
+            <property name="auditFechaFin" value="auditFechaFin"/>
+        </include>
+    </select>
+
+
+    <insert id="insert"  parameterType="pe.gob.minjus.sisarb.model.domain.Auditoria">
+        insert into AUD_AUDITORIA (<include refid="columnsInsert" />) values
+        (UPPER(#{tabla, jdbcType=VARCHAR}),
+        #{codigo, jdbcType=VARCHAR},
+        #{movimiento, jdbcType=INTEGER},
+        UPPER(#{auditUsuario, jdbcType=VARCHAR}),
+        sysdate,
+        UPPER(#{auditTipo,jdbcType=VARCHAR}),
+        UPPER(#{valorOriginal,jdbcType=VARCHAR}),
+        UPPER(#{valorFinal,jdbcType=VARCHAR}))
+    </insert>
+
+    <!-- Obetener correlativo movimiento -->
+    <select id="getMovimiento" resultType="java.math.BigDecimal">
+        SELECT SEQ_AUD_AUDITORIA.NEXTVAL FROM DUAL
+    </select>
+
+</mapper>

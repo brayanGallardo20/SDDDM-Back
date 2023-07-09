@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pe.gob.minjus.sisarb.model.mapper.InstitucionPersonaMapper">
+    
+        <sql id="columnsInsertIntitutionPersona">
+        INSTITUCION_PERSONA_ID,
+		INSTITUCION_ID,
+		PERSONA_ID,
+		PERSONA_CARGO_ID,
+		AUDIT_USUARIO_CREACION,
+		AUDIT_FECHA_CREACION,
+		ACTIVO
+    </sql>          
+
+<sql id="columnSelectIntitutionPersona">
+        INSTITUCION_PERSONA_ID,
+		INSTITUCION_ID,
+		PERSONA_ID,
+		PERSONA_CARGO_ID,
+		ACTIVO,
+		audit_usuario_creacion,
+        audit_fecha_creacion,
+        audit_usuario_modifica,
+        audit_fecha_modifica,
+        TO_CHAR(audit_fecha_creacion, 'yyyy-mm-dd')  audit_fecha_creacion_format,
+        TO_CHAR(audit_fecha_modifica, 'yyyy-mm-dd') audit_fecha_modifica_format
+    </sql>  
+    
+      <resultMap id="resultFindInstiPersona" type="pe.gob.minjus.sisarb.model.domain.InstitucionPersona">                     
+        <result property="institucionPersonaId"        column="INSTITUCION_PERSONA_ID" /> 
+        <result property="institucionId"        column="INSTITUCION_ID" /> 
+        <result property="personaId"        column="PERSONA_ID" /> 
+        <result property="personaCargoId"        column="PERSONA_CARGO_ID" /> 
+        <result property="activo"        column="ACTIVO" /> 
+        <result property="auditUsuarioCreacion"            column="AUDIT_USUARIO_CREACION" />
+        <result property="auditFechaCreacion"            column="AUDIT_FECHA_CREACION" />
+        <result property="auditUsuarioModifica"            column="AUDIT_USUARIO_MODIFICA" />
+        <result property="auditFechaModifica"            column="AUDIT_FECHA_MODIFICA" />
+        <result property="auditFechaCreacionFormat"            column="AUDIT_FECHA_CREACION_FORMAT" />
+        <result property="auditFechaModificaFormat"            column="AUDIT_FECHA_MODIFICA_FORMAT" />
+      </resultMap> 
+      
+       <update id="updateInstitucionPersona" parameterType="pe.gob.minjus.sisarb.model.domain.InstitucionPersona">
+        update TRS_INSTITUCION_PERSONA
+        set             
+			PERSONA_ID=#{personaId}	,
+			AUDIT_USUARIO_MODIFICA = UPPER(#{auditUsuarioModifica, jdbcType=VARCHAR})	,
+		    AUDIT_FECHA_MODIFICA = SYSDATE
+        where INSTITUCION_ID=#{institucionId}
+    </update>  
+       
+        <insert id="insertInstitucionPersona"  parameterType="pe.gob.minjus.sisarb.model.domain.InstitucionPersona">
+      
+       <selectKey keyProperty="institucionPersonaId" order="BEFORE" resultType="java.lang.Integer">
+            SELECT SEQ_TRS_INSTITUCION_PERSONA.NEXTVAL FROM DUAL
+       </selectKey>
+        insert into TRS_INSTITUCION_PERSONA (<include refid="columnsInsertIntitutionPersona" />) values        
+        ( 
+         #{institucionPersonaId, jdbcType=NUMERIC},
+          #{institucionId, jdbcType=NUMERIC},
+          #{personaId, jdbcType=NUMERIC},
+          #{personaCargoId, jdbcType=NUMERIC},
+          UPPER(#{auditUsuarioCreacion, jdbcType=VARCHAR}),
+          SYSDATE,
+          1 
+        )          
+    </insert>
+
+        <select id="findByIntitucionPersona" resultMap="resultFindInstiPersona" parameterType="pe.gob.minjus.sisarb.model.domain.InstitucionPersona">
+        SELECT <include refid="columnSelectIntitutionPersona" /> FROM TRS_INSTITUCION_PERSONA WHERE ACTIVO = 1 AND PERSONA_CARGO_ID = #{personaCargoId, jdbcType=INTEGER} AND INSTITUCION_ID = #{institucionId, jdbcType=INTEGER}
+        </select>     
+
+    <select id="findById" resultMap="resultFindInstiPersona" parameterType="java.lang.Integer">
+        SELECT
+        <include refid="columnSelectIntitutionPersona">
+        </include>
+        FROM TRS_INSTITUCION_PERSONA
+        WHERE ACTIVO=1 AND INSTITUCION_PERSONA_ID = #{id, jdbcType=INTEGER}
+    </select>
+
+
+ <update id="delete"  parameterType="pe.gob.minjus.sisarb.model.domain.InstitucionPersona">
+        update TRS_INSTITUCION_PERSONA
+        set            
+            ACTIVO = 0,
+            AUDIT_FECHA_MODIFICA= SYSDATE,
+			AUDIT_USUARIO_MODIFICA=TRIM(UPPER(#{auditUsuarioModifica, jdbcType=VARCHAR}))            
+        where INSTITUCION_ID = #{institucionId, jdbcType=NUMERIC} AND PERSONA_CARGO_ID = 101 AND PERSONA_ID = #{personaId, jdbcType=NUMERIC}
+    </update>
+
+</mapper>

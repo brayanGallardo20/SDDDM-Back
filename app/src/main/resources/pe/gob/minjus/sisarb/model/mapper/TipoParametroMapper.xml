@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pe.gob.minjus.sisarb.model.mapper.TipoParametroMapper">
+
+    <sql id="columnsSelect">
+        TIPO_PARAMETRO_ID, NOMBRE, DESCRIPCION,
+                 AUDIT_USUARIO_CREACION,
+        AUDIT_FECHA_CREACION,
+        AUDIT_USUARIO_MODIFICA,
+        AUDIT_FECHA_MODIFICA,
+        TO_CHAR(AUDIT_FECHA_CREACION, 'yyyy-mm-dd hh24:mi')  AUDIT_FECHA_CREACION_FORMAT,
+        TO_CHAR(AUDIT_FECHA_MODIFICA, 'yyyy-mm-dd hh24:mi') AUDIT_FECHA_MODIFICA_FORMAT
+    </sql>
+    
+     <sql id="columnsFind"> TIPO_PARAMETRO_ID, NOMBRE, DESCRIPCION, AUDIT_USUARIO_CREACION, AUDIT_FECHA_CREACION </sql>
+   
+    <sql id="columnsInsert">
+        TIPO_PARAMETRO_ID, NOMBRE, DESCRIPCION, AUDIT_USUARIO_CREACION, AUDIT_FECHA_CREACION, ACTIVO
+    </sql>
+
+    <resultMap id="resultListBusquedaTipoParametro" type="pe.gob.minjus.sisarb.model.domain.TipoParametro">
+        <result property="tipoParametroId"            column="TIPO_PARAMETRO_ID" />
+        <result property="descripcion"           column="DESCRIPCION" />
+        <result property="valor"        column="VALOR" />
+        <result property="auditUsuarioCreacion"         column="AUDIT_USUARIO_CREACION" />
+        <result property="auditFechaCreacion"           column="AUDIT_FECHA_CREACION" />
+        <result property="auditUsuarioModifica"         column="AUDIT_USUARIO_MODIFICA" />
+        <result property="auditFechaModifica"           column="AUDIT_FECHA_MODIFICA" />
+        <result property="auditFechaCreacionFormat"     column="AUDIT_FECHA_CREACION_FORMAT" />
+        <result property="auditFechaModificaFormat"     column="AUDIT_FECHA_MODIFICA_FORMAT" />        
+    </resultMap>
+
+    <select id="listTipoParametro" resultMap="resultListBusquedaTipoParametro" parameterType="pe.gob.minjus.sisarb.model.request.TipoParametroRequest">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        FROM MAE_TIPO_PARAMETRO
+        <include refid="listBusquedaTipoParametroWhere">
+            <property name="DESCRIPCION" value="DESCRIPCION"/>
+        </include>
+        OFFSET #{limite,jdbcType=INTEGER} ROWS FETCH NEXT #{cantidadPorPagina,jdbcType=INTEGER} ROWS ONLY
+    </select>
+
+    <select id="listTipoParametroAll" resultMap="resultListBusquedaTipoParametro">
+        SELECT
+        *
+        FROM MAE_TIPO_PARAMETRO
+        where activo = 1
+       </select>
+
+
+    <sql id="listBusquedaTipoParametroWhere">
+        WHERE 1=1
+        <if test="DESCRIPCION!=null"> AND DESCRIPCION=UPPER(#{descripcion}) </if>
+    </sql>
+
+    <!-- Query para calcular el total -->
+    <select id="listTipoParametroTotal" resultType="java.lang.Integer" parameterType="pe.gob.minjus.sisarb.model.request.TipoParametroRequest">
+        select count(1) total FROM MAE_TIPO_PARAMETRO
+        <include refid="listBusquedaTipoParametroWhere">
+            <property name="DESCRIPCION" value="DESCRIPCION"/>
+        </include>
+    </select>
+    
+        <insert id="insert"  parameterType="pe.gob.minjus.sisarb.model.domain.TipoParametro">
+      <selectKey keyProperty="tipoParametroId" order="BEFORE" resultType="java.lang.Integer">
+            SELECT SEQ_MAE_TIPO_PARAMETRO.NEXTVAL FROM DUAL
+        </selectKey>
+      
+        insert into MAE_TIPO_PARAMETRO (<include refid="columnsInsert" />) values        
+        ( 
+          #{tipoParametroId, jdbcType=NUMERIC},
+            REGEXP_REPLACE(TRIM(UPPER(#{nombre, jdbcType=VARCHAR})), ' +', ' '),
+            REGEXP_REPLACE(TRIM(UPPER(#{descripcion, jdbcType=VARCHAR})), ' +', ' '),
+          UPPER(#{auditUsuarioCreacion, jdbcType=VARCHAR}),
+          SYSDATE ,
+          1  
+        )          
+    </insert>
+    
+      <resultMap id="resultFind" type="pe.gob.minjus.sisarb.model.domain.TipoParametro">                     
+        <result property="tipoParametroId"        column="tipoParametroId" /> 
+      </resultMap>                  
+      
+       <select id="findById" resultMap="resultListBusquedaTipoParametro" parameterType="java.lang.Integer">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        FROM MAE_TIPO_PARAMETRO
+        WHERE ACTIVO=1 AND TIPO_PARAMETRO_ID = #{id, jdbcType=INTEGER}
+    </select>
+      
+    <select id="find" resultMap="resultFind" >
+        SELECT <include refid="columnsFind" /> FROM MAE_TIPO_PARAMETRO where ACTIVO=1 AND NOMBRE=UPPER(#{nombre})
+    </select> 
+    
+    <update id="update" parameterType="pe.gob.minjus.sisarb.model.domain.TipoParametro">
+        update MAE_TIPO_PARAMETRO
+        set            
+        NOMBRE=REGEXP_REPLACE(TRIM(UPPER(#{nombre, jdbcType=VARCHAR})), ' +', ' '),
+        DESCRIPCION=REGEXP_REPLACE(TRIM(UPPER(#{descripcion, jdbcType=VARCHAR})), ' +', ' '),
+        AUDIT_FECHA_MODIFICA= SYSDATE,
+        AUDIT_USUARIO_MODIFICA=TRIM(UPPER(#{auditUsuarioModifica, jdbcType=VARCHAR}))
+        where TIPO_PARAMETRO_ID=#{tipoParametroId}
+    </update>  
+    
+        <update id="delete" parameterType="String">
+        update MAE_TIPO_PARAMETRO
+        set            
+            ACTIVO = 0              
+        where TIPO_PARAMETRO_ID= '${value}'
+    </update>   
+    
+    <select id="countTipoParametroById" parameterType="java.lang.Integer" resultType="java.lang.Integer"  >
+        SELECT
+        COUNT(1)
+        FROM MAE_PARAMETRO_VALOR
+        WHERE ACTIVO=1 AND
+        TIPO_PARAMETRO_ID = #{parametroId, jdbcType=INTEGER}
+    </select>
+    
+    
+        
+</mapper>

@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="pe.gob.minjus.sisarb.model.mapper.MaestraMapper">
+
+		<select id="listPaginated" resultMap="resultlistPaginated" parameterType="pe.gob.minjus.sisarb.model.request.MaestraBusquedaRequest">
+		SELECT
+		<include refid="columnsSelect">
+			<property name="tablaMaestra" value="tablaMaestra" />
+		</include>
+		FROM
+		<include refid="fromTabla">
+			<property name="tablaMaestra" value="tablaMaestra" />
+		</include>
+		<include refid="listPaginatedWhere">
+			<property name="nombre" value="nombre"/>
+			<property name="auditUsuarioCreacion" value="auditUsuarioCreacion"/>
+			<property name="auditFechaCreacion" value="auditFechaCreacion"/>
+			<property name="auditUsuarioModifica" value="auditUsuarioModifica"/>
+			<property name="auditFechaModifica" value="auditFechaModifica"/>
+		</include>
+		OFFSET #{filaInicio,jdbcType=INTEGER} ROWS FETCH NEXT #{cantidadPorPagina,jdbcType=INTEGER} ROWS ONLY
+	</select>
+
+	<sql id="columnsSelect">
+		<include refid="getMaestraId">
+			<property name="tablaMaestra" value="tablaMaestra" />
+		</include>
+		, NOMBRE,		
+        AUDIT_USUARIO_CREACION,
+        AUDIT_FECHA_CREACION,
+        AUDIT_USUARIO_MODIFICA,
+        AUDIT_FECHA_MODIFICA,
+        TO_CHAR(AUDIT_FECHA_CREACION, 'yyyy-mm-dd hh24:mi')  AUDIT_FECHA_CREACION_FORMAT,
+        TO_CHAR(AUDIT_FECHA_MODIFICA, 'yyyy-mm-dd hh24:mi') AUDIT_FECHA_MODIFICA_FORMAT		
+		
+		
+	</sql>
+
+	<sql id="getMaestraId">
+		<if test="tablaMaestra =='MAE_ESTADO_ARBITRAL' "> ESTADO_ARBITRAL_ID AS maestraId </if>
+		<if test="tablaMaestra=='MAE_ETAPA_ARBITRAL' "> ETAPA_ARBITRAL_ID AS maestraId  </if>
+		<if test="tablaMaestra=='MAE_TIPO_OPERADOR_ARBITRAL' "> TIPO_OPERADOR_ARBITRAL_ID AS maestraId  </if>
+		<if test="tablaMaestra=='MAE_TIPO_ARBITRO' "> TIPO_ARBITRO_ID AS maestraId  </if>
+	</sql>
+
+
+	<sql id="fromTabla">
+		<if test="tablaMaestra =='MAE_ESTADO_ARBITRAL' "> MAE_ESTADO_ARBITRAL </if>
+		<if test="tablaMaestra=='MAE_ETAPA_ARBITRAL' "> MAE_ETAPA_ARBITRAL  </if>
+		<if test="tablaMaestra=='MAE_TIPO_OPERADOR_ARBITRAL' "> MAE_TIPO_OPERADOR_ARBITRAL  </if>
+		<if test="tablaMaestra=='MAE_TIPO_ARBITRO' "> MAE_TIPO_ARBITRO </if>
+	</sql>
+
+	<resultMap id="resultlistPaginated" type="pe.gob.minjus.sisarb.model.domain.Maestra">
+		<result property="nombre" 						column="NOMBRE" />
+		<result property="auditUsuarioCreacion"         column="AUDIT_USUARIO_CREACION" />
+		<result property="auditFechaCreacion"           column="AUDIT_FECHA_CREACION" />
+		<result property="auditUsuarioModifica"         column="AUDIT_USUARIO_MODIFICA" />
+		<result property="auditFechaModifica"           column="AUDIT_FECHA_MODIFICA" />
+		<result property="auditFechaCreacionFormat"     column="AUDIT_FECHA_CREACION_FORMAT" />
+		<result property="auditFechaModificaFormat"     column="AUDIT_FECHA_MODIFICA_FORMAT" />
+	</resultMap>
+
+
+
+	<sql id="listPaginatedWhere">
+		WHERE ACTIVO=1
+		<if test="nombre != null and nombre!=''"> AND NOMBRE  LIKE '%'|| REGEXP_REPLACE(TRIM(UPPER(#{nombre})), ' +', ' ')||'%' </if>
+	</sql>
+
+	<!-- listPaginated  FIN  -->
+
+	<!-- Calcular el total -->
+	<select id="listPaginatedTotal" resultType="java.lang.Integer" parameterType="pe.gob.minjus.sisarb.model.request.MaestraBusquedaRequest">
+		select count(1) total FROM
+		<include refid="fromTabla">
+			<property name="tablaMaestra" value="tablaMaestra" />
+		</include>
+		<include refid="listPaginatedWhere">
+			<property name="nombre" value="nombre"/>
+			<property name="auditUsuarioCreacion" value="auditUsuarioCreacion"/>
+			<property name="auditFechaCreacion" value="auditFechaCreacion"/>
+			<property name="auditUsuarioModifica" value="auditUsuarioModifica"/>
+			<property name="auditFechaModifica" value="auditFechaModifica"/>
+		</include>
+	</select>
+
+
+	<select id="findById" resultMap="resultlistPaginated" parameterType="pe.gob.minjus.sisarb.model.domain.Maestra">
+		SELECT
+		<include refid="columnsSelect">
+			<property name="tablaMaestra" value="tablaMaestra" />
+		</include>
+		FROM
+		<include refid="fromTabla">
+			<property name="tablaMaestra" value="tablaMaestra" />
+		</include>
+		<include refid="selectMaestraWhere">
+			<property name="maestraId" value="maestraId" />
+			<property name="tablaMaestra" value="tablaMaestra" />
+		</include>
+	</select>
+
+
+	<select id="findByName" resultMap="resultlistPaginated" parameterType="pe.gob.minjus.sisarb.model.domain.Maestra">
+		SELECT
+		<include refid="columnsSelect">
+			<property name="tablaMaestra" value="tablaMaestra" />
+		</include>
+		FROM
+		<include refid="fromTabla">
+			<property name="tablaMaestra" value="tablaMaestra" />
+		</include>
+		<include refid="selectMaestraWhereByName">
+			<property name="nombre" value="nombre" />
+			<property name="tablaMaestra" value="tablaMaestra" />
+		</include>
+	</select>
+
+	<sql id="selectMaestraWhereByName">
+		WHERE
+		ACTIVO =1 AND
+		<include refid="findSetByIdName">
+			<property name="nombre" value="nombre" />
+			<property name="tablaMaestra" value="tablaMaestra" />
+		</include>
+	</sql>
+
+
+	<sql id="selectMaestraWhere">
+		WHERE
+		ACTIVO =1 AND
+		<include refid="findSetById">
+			<property name="maestraId" value="maestraId" />
+			<property name="tablaMaestra" value="tablaMaestra" />
+		</include>
+	</sql>
+
+
+		<!-- save -->
+
+	<insert id="save" parameterType="pe.gob.minjus.sisarb.model.domain.Maestra">
+		<selectKey keyProperty="maestraId" order="BEFORE" resultType="java.lang.Integer">
+			SELECT
+			<include refid="getSequenceMaestra">
+				<property name="tablaMaestra" value="tablaMaestra" />
+			</include>
+			FROM DUAL
+		</selectKey>
+		INSERT INTO
+		<include refid="fromTabla">
+			<property name="tablaMaestra" value="tablaMaestra" />
+		</include>
+		(<include refid="columnsInsert" />) values
+		(
+		#{maestraId, jdbcType=INTEGER},
+		REGEXP_REPLACE(TRIM(UPPER(#{nombre, jdbcType=VARCHAR})), ' +', ' '),
+		'1',
+		UPPER(#{auditUsuarioCreacion, jdbcType=VARCHAR}),
+		SYSDATE)
+	</insert>
+
+
+	<sql id="getSequenceMaestra">
+		<if test="tablaMaestra =='MAE_ESTADO_ARBITRAL' "> SEQ_MAE_ESTADO_ARBITRAL.NEXTVAL </if>
+		<if test="tablaMaestra=='MAE_ETAPA_ARBITRAL' "> SEQ_MAE_ETAPA_ARBITRAL.NEXTVAL  </if>
+		<if test="tablaMaestra=='MAE_TIPO_OPERADOR_ARBITRAL' "> SEQ_MAE_TIPO_OPERADOR_ARBITRAL.NEXTVAL  </if>
+		<if test="tablaMaestra=='MAE_TIPO_ARBITRO' "> SEQ_MAE_TIPO_ARBITRO.NEXTVAL  </if>
+	</sql>
+
+	<sql id="columnsInsert">
+		<include refid="selectMaestraId" />,
+		NOMBRE,
+		ACTIVO,
+		AUDIT_USUARIO_CREACION,
+		AUDIT_FECHA_CREACION
+	</sql>
+
+
+	<sql id="selectMaestraId">
+	   <if test="tablaMaestra =='MAE_ESTADO_ARBITRAL' "> ESTADO_ARBITRAL_ID </if>
+		<if test="tablaMaestra=='MAE_ETAPA_ARBITRAL' "> ETAPA_ARBITRAL_ID  </if>
+		<if test="tablaMaestra=='MAE_TIPO_OPERADOR_ARBITRAL' "> TIPO_OPERADOR_ARBITRAL_ID  </if>
+		<if test="tablaMaestra=='MAE_TIPO_ARBITRO' "> TIPO_ARBITRO_ID  </if>
+	</sql>
+
+	<update id="update" parameterType="pe.gob.minjus.sisarb.model.domain.Maestra">
+		UPDATE
+		<include refid="fromTabla">
+			<property name="tablaMaestra" value="tablaMaestra" />
+		</include>
+		SET
+		AUDIT_FECHA_MODIFICA=sysdate
+		<if test="nombre != null and nombre!=''">,NOMBRE =REGEXP_REPLACE(TRIM(UPPER(#{nombre, jdbcType=VARCHAR})), ' +', ' ') </if>
+		<if test="auditUsuarioModifica != null and auditUsuarioModifica!=''">, AUDIT_USUARIO_MODIFICA=UPPER(#{auditUsuarioModifica, jdbcType=VARCHAR}) </if>
+
+		WHERE
+		<include refid="findSetById">
+			<property name="maestraId" value="maestraId" />
+			<property name="tablaMaestra" value="tablaMaestra" />
+		</include>
+	</update>
+
+
+	<sql id="findSetById">
+	   <if test="tablaMaestra =='MAE_ESTADO_ARBITRAL' "> ESTADO_ARBITRAL_ID = #{maestraId} </if>
+		<if test="tablaMaestra=='MAE_ETAPA_ARBITRAL' "> ETAPA_ARBITRAL_ID = #{maestraId} </if>
+		<if test="tablaMaestra=='MAE_TIPO_OPERADOR_ARBITRAL' "> TIPO_OPERADOR_ARBITRAL_ID = #{maestraId} </if>
+		<if test="tablaMaestra=='MAE_TIPO_ARBITRO' "> TIPO_ARBITRO_ID  = #{maestraId}</if>
+	</sql>
+	
+
+	<sql id="findSetByIdName">
+	       NOMBRE  = UPPER(#{nombre})
+	</sql>
+	
+
+
+	<update id="deleteById" parameterType="pe.gob.minjus.sisarb.model.domain.Maestra">
+		UPDATE
+		<include refid="fromTabla">
+			<property name="tablaMaestra" value="tablaMaestra" />
+		</include>
+		SET
+		ACTIVO=0
+		WHERE
+		<include refid="findSetById">
+			<property name="maestraId" value="maestraId" />
+			<property name="tablaMaestra" value="tablaMaestra" />
+		</include>
+	</update>
+
+	<sql id="columnsSelectChoose">
+		<include refid="getMaestraId">
+			<property name="tablaMaestra" value="tablaMaestra" />
+		</include>
+		,NOMBRE
+	</sql>
+
+	<select id="listChoose" resultMap="resultlistPaginated"  >
+		SELECT
+		<include refid="columnsSelectChoose">
+		</include>
+		FROM
+		<include refid="fromTabla">
+			<property name="tablaMaestra" value="tablaMaestra" />
+		</include>
+		WHERE ACTIVO=1
+	</select>
+
+</mapper>

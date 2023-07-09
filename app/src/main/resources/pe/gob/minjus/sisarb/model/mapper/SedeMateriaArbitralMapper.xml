@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pe.gob.minjus.sisarb.model.mapper.SedeMateriaArbitralMapper">
+
+    <sql id="columnsSelect">
+        SEDE_MATERIA_ARBITRAL_ID,
+        SEDE_ID,
+        MATERIA_ARBITRAL_ID,
+        AUDIT_USUARIO_CREACION,
+        AUDIT_FECHA_CREACION,
+        AUDIT_USUARIO_MODIFICA,
+        AUDIT_FECHA_MODIFICA,
+        TO_CHAR(AUDIT_FECHA_CREACION, 'yyyy-mm-dd hh24:mi')  AUDIT_FECHA_CREACION_FORMAT,
+        TO_CHAR(AUDIT_FECHA_MODIFICA, 'yyyy-mm-dd hh24:mi') AUDIT_FECHA_MODIFICA_FORMAT
+    </sql>
+
+    <sql id="columnsInsert">
+        SEDE_MATERIA_ARBITRAL_ID,
+        SEDE_ID,
+        MATERIA_ARBITRAL_ID,
+        ACTIVO,
+        AUDIT_USUARIO_CREACION,
+        AUDIT_FECHA_CREACION
+    </sql>
+
+
+    <resultMap id="resultList" type="pe.gob.minjus.sisarb.model.domain.SedeMateriaArbitral">
+        <id  property="sedeMateriaArbitralId"              column="SEDE_MATERIA_ARBITRAL_ID"  />
+        <result property="sedeId"                       column="SEDE_MATERIA_ARBITRAL_ID" />
+        <result property="materiaArbitralId"            column="MATERIA_ARBITRAL_ID" />
+        <result property="auditUsuarioCreacion"         column="AUDIT_USUARIO_CREACION" />
+        <result property="auditFechaCreacion"           column="AUDIT_FECHA_CREACION" />
+        <result property="auditUsuarioModifica"         column="AUDIT_USUARIO_MODIFICA" />
+        <result property="auditFechaModifica"           column="AUDIT_FECHA_MODIFICA" />
+
+        <result property="auditFechaCreacionFormat"     column="AUDIT_FECHA_CREACION_FORMAT" />
+        <result property="auditFechaModificaFormat"     column="AUDIT_FECHA_MODIFICA_FORMAT" />
+    </resultMap>
+
+    <select id="findBySede" resultMap="resultList">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        FROM TRS_SEDE_MATERIA_ARBITRAL MA
+        WHERE SEDE_ID=#{sedeId}
+        AND ACTIVO=1
+    </select>
+
+    <insert id="save"  parameterType="pe.gob.minjus.sisarb.model.domain.SedeMateriaArbitral">
+        <selectKey keyProperty="sedeMateriaArbitralId" order="BEFORE" resultType="java.lang.Integer">
+            SELECT SEQ_TRS_SEDE_MATERIA_ARBITRAL.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TRS_SEDE_MATERIA_ARBITRAL (<include refid="columnsInsert" />) values
+        (
+        #{sedeMateriaArbitralId, jdbcType=INTEGER},
+        #{sedeId, jdbcType=INTEGER},
+        #{materiaArbitralId, jdbcType=INTEGER},
+        1,
+        TRIM(UPPER(#{auditUsuarioCreacion,jdbcType=VARCHAR})),
+        sysdate
+        )
+    </insert>
+
+    <update id="update" parameterType="pe.gob.minjus.sisarb.model.domain.SedeMateriaArbitral">
+        UPDATE TRS_SEDE_MATERIA_ARBITRAL
+        SET
+        AUDIT_FECHA_MODIFICA = sysdate,
+        AUDIT_USUARIO_MODIFICA = TRIM(UPPER(#{auditUsuarioModifica,jdbcType=VARCHAR}))
+        where SEDE_MATERIA_ARBITRAL_ID=#{sedeMateriaArbitralId, jdbcType=INTEGER}
+    </update>
+
+    <update id="deleteById">
+        UPDATE TRS_SEDE_MATERIA_ARBITRAL
+        SET
+        AUDIT_FECHA_MODIFICA = sysdate,
+        AUDIT_USUARIO_MODIFICA = TRIM(UPPER(#{auditUsuarioModifica,jdbcType=VARCHAR})),
+        ACTIVO=0
+        where SEDE_MATERIA_ARBITRAL_ID=#{sedeMateriaArbitralId, jdbcType=INTEGER}
+    </update>
+
+    <select id="findById" resultMap="resultList">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        FROM TRS_SEDE_MATERIA_ARBITRAL MA
+        WHERE  MA.SEDE_MATERIA_ARBITRAL_ID=#{sedeMateriaArbitralId}
+        AND MA.ACTIVO=1
+    </select>
+
+</mapper>

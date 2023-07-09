@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pe.gob.minjus.sisarb.model.mapper.ConfiguracionMapper">
+
+    <sql id="columnsSelectFind">
+        CONFIGURACION_ID,
+        CONCEPTO,
+        SISTEMA_ID,
+        SISTEMA_VERSION,
+        REPOSITORIO,
+        TIPO_DOCUMENTO,
+        TIPO_IMAGEN,
+        TAMANIO_DOCUMENTO,
+        TAMANIO_IMAGEN,
+        WEB_SERVICIO_SEGURIDAD,
+        WEB_SERVICIO_PIDE,
+        LDAP_URL,
+        LDAP_DOMINIO,
+        SMTP_HOST,
+        ACTIVO,
+        LIMITE_DOCUMENTO,
+        LIMITE_IMAGEN,
+        LIMITE_FILA,
+        RUTA_LOGO, RUTA_LOGO_RELATIVO,
+        AUDIT_FECHA_CREACION, AUDIT_USUARIO_MODIFICA,
+        AUDIT_FECHA_MODIFICA
+    </sql>
+
+    <sql id="columnsInsert">
+        CONFIGURACION_ID,
+        CONCEPTO,
+        SISTEMA_ID,
+        SISTEMA_VERSION,
+        REPOSITORIO,
+        TIPO_DOCUMENTO,
+        TIPO_IMAGEN,
+        TAMANIO_DOCUMENTO,
+        TAMANIO_IMAGEN,
+        WEB_SERVICIO_SEGURIDAD,
+        WEB_SERVICIO_PIDE,
+        LDAP_URL,
+        LDAP_DOMINIO,
+        SMTP_HOST,
+        ACTIVO,
+        LIMITE_DOCUMENTO,
+        LIMITE_IMAGEN,
+        LIMITE_FILA,
+        RUTA_LOGO,
+        RUTA_LOGO_RELATIVO,
+        AUDIT_FECHA_CREACION,
+        AUDIT_USUARIO_MODIFICA,
+        AUDIT_FECHA_MODIFICA
+    </sql>
+
+    <resultMap id="resultFindById" type="pe.gob.minjus.sisarb.model.domain.Configuracion">
+        <id column="CONFIGURACION_ID"                       property="configuracionId" />
+        <result column="CONCEPTO"                           property="concepto" />
+        <result column="SISTEMA_ID"                         property="sistemaId" />
+        <result column="SISTEMA_VERSION"                    property="sistemaVersion" />
+        <result column="REPOSITORIO"                        property="repositorio" />
+        <result column="TIPO_DOCUMENTO"                     property="tipoDocumento" />
+        <result column="TIPO_IMAGEN"                        property="tipoImagen" />
+        <result column="TAMANIO_DOCUMENTO"                  property="tamanioDocumento" />
+        <result column="TAMANIO_IMAGEN"                     property="tamanioImagen" />
+        <result column="WEB_SERVICIO_SEGURIDAD"             property="webServicioSeguridad" />
+        <result column="WEB_SERVICIO_PIDE"                  property="webServicioPide" />
+        <result column="LDAP_URL"                           property="ldapUrl" />
+        <result column="LDAP_DOMINIO"                       property="ldapDominio" />
+        <result column="SMTP_HOST"                          property="smtpHost" />
+        <result column="ACTIVO"                             property="activo" />
+        <result column="LIMITE_DOCUMENTO"                   property="limiteDocumento" />
+        <result column="LIMITE_IMAGEN"                      property="limiteImagen" />
+        <result column="LIMITE_FILA"                         property="limiteFila" />
+        <result column="RUTA_LOGO"                          property="rutaLogo" />
+        <result column="RUTA_LOGO_RELATIVO"                 property="rutaLogoRelativo" />
+        <result column="AUDIT_FECHA_CREACION"               property="auditFechaCreacion" />
+        <result column="AUDIT_USUARIO_MODIFICA"             property="auditUsuarioModifica" />
+        <result column="AUDIT_FECHA_MODIFICA"               property="auditFechaModifica" />
+    </resultMap>
+
+
+
+    <select id="findById" resultMap="resultFindById" parameterType="pe.gob.minjus.sisarb.model.domain.Configuracion">
+        SELECT
+        <include refid="columnsSelectFind">
+        </include>
+        FROM MAE_CONFIGURACION
+        WHERE CONFIGURACION_ID = REGEXP_REPLACE(TRIM(UPPER(#{configuracionId, jdbcType=VARCHAR})), ' +', ' ')
+    </select>
+
+    <update id="update" parameterType="pe.gob.minjus.sisarb.model.domain.Configuracion">
+        UPDATE MAE_CONFIGURACION
+        SET
+        AUDIT_FECHA_MODIFICA =sysdate
+        <if test="concepto != null and concepto!=''">,CONCEPTO =REGEXP_REPLACE(TRIM(UPPER(#{concepto, jdbcType=VARCHAR})), ' +', ' ') </if>
+        <if test="sistemaId != null">,SISTEMA_ID =#{sistemaId, jdbcType=INTEGER} </if>
+        <if test="sistemaVersion != null and sistemaVersion!=''">,SISTEMA_VERSION =REGEXP_REPLACE(TRIM(UPPER(#{sistemaVersion, jdbcType=VARCHAR})), ' +', ' ') </if>
+        <if test="repositorio != null and repositorio!=''">,REPOSITORIO =REGEXP_REPLACE(TRIM(UPPER(#{repositorio, jdbcType=VARCHAR})), ' +', ' ') </if>
+        <if test="tipoDocumento != null and tipoDocumento!=''">,TIPO_DOCUMENTO =REGEXP_REPLACE(TRIM(UPPER(#{tipoDocumento, jdbcType=VARCHAR})), ' +', ' ') </if>
+        <if test="tipoImagen != null and tipoImagen!=''">,TIPO_IMAGEN =REGEXP_REPLACE(TRIM(UPPER(#{tipoImagen, jdbcType=VARCHAR})), ' +', ' ') </if>
+        <if test="tamanioDocumento != null">,TAMANIO_DOCUMENTO =#{tamanioDocumento, jdbcType=INTEGER}</if>
+        <if test="tamanioImagen != null">,TAMANIO_IMAGEN =#{tamanioImagen, jdbcType=INTEGER} </if>
+        <if test="webServicioSeguridad != null and webServicioSeguridad!=''">,WEB_SERVICIO_SEGURIDAD =TRIM(#{webServicioSeguridad, jdbcType=VARCHAR})</if>
+        <if test="webServicioPide != null">,WEB_SERVICIO_PIDE =TRIM(#{webServicioPide, jdbcType=VARCHAR})</if>
+        <if test="ldapUrl != null">,LDAP_URL =REGEXP_REPLACE(TRIM(UPPER(#{ldapUrl, jdbcType=VARCHAR})), ' +', ' ') </if>
+        <if test="ldapDominio != null ">,LDAP_DOMINIO =REGEXP_REPLACE(TRIM(UPPER(#{ldapDominio, jdbcType=VARCHAR})), ' +', ' ') </if>
+        <if test="smtpHost != null ">,SMTP_HOST =REGEXP_REPLACE(TRIM(UPPER(#{smtpHost, jdbcType=VARCHAR})), ' +', ' ') </if>
+        <if test="activo != null">,ACTIVO =#{activo, jdbcType=INTEGER} </if>
+        ,LIMITE_DOCUMENTO =#{limiteDocumento, jdbcType=INTEGER}
+        ,LIMITE_IMAGEN =#{limiteImagen, jdbcType=INTEGER}
+        <if test="limiteFila != null">,LIMITE_FILA =#{limiteFila, jdbcType=INTEGER} </if>
+        <if test="rutaLogo != null">,RUTA_LOGO =REGEXP_REPLACE(TRIM(UPPER(#{rutaLogo, jdbcType=VARCHAR})), ' +', ' ') </if>
+        <if test="rutaLogoRelativo != null">,RUTA_LOGO_RELATIVO =#{rutaLogoRelativo, jdbcType=INTEGER} </if>
+        <if test="auditUsuarioModifica != null and auditUsuarioModifica!=''">,AUDIT_USUARIO_MODIFICA =REGEXP_REPLACE(TRIM(UPPER(#{auditUsuarioModifica, jdbcType=VARCHAR})), ' +', ' ') </if>
+
+        where CONFIGURACION_ID=REGEXP_REPLACE(TRIM(UPPER(#{configuracionId, jdbcType=VARCHAR})), ' +', ' ')
+    </update>
+
+    <select id="getWebServiceSeguridad" resultType="java.lang.String"  parameterType="java.lang.String">
+        SELECT
+        WEB_SERVICIO_SEGURIDAD
+        FROM MAE_CONFIGURACION
+        WHERE CONFIGURACION_ID = REGEXP_REPLACE(TRIM(UPPER(#{configuracionId, jdbcType=VARCHAR})), ' +', ' ')
+    </select>
+
+    <select id="getWebServicePide" resultType="java.lang.String"  parameterType="java.lang.String">
+        SELECT
+        WEB_SERVICIO_PIDE
+        FROM MAE_CONFIGURACION
+        WHERE CONFIGURACION_ID = REGEXP_REPLACE(TRIM(UPPER(#{configuracionId, jdbcType=VARCHAR})), ' +', ' ')
+    </select>
+
+
+
+
+</mapper>

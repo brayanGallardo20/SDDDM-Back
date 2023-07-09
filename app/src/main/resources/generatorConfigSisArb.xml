@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+		PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+		"http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+	<properties resource="generatorConfig.properties" />
+
+
+	<classPathEntry location="${sisarb.mbg.jdbc.driver-location}" />
+
+	<context id="mysql" targetRuntime="MyBatis3">
+
+		<!-- Agrega método toString a objetos clase generados -->
+		<plugin type="org.mybatis.generator.plugins.ToStringPlugin" />
+
+		<commentGenerator>
+			<property name="suppressAllComments" value="false" />
+		</commentGenerator>
+
+		<jdbcConnection
+			driverClass="${sisarb.mbg.jdbc.driver-class-name}"
+			connectionURL="${sisarb.mbg.jdbc.url}" userId="${sisarb.mbg.jdbc.username}"
+			password="${sisarb.mbg.jdbc.password}">
+			<property name="nullCatalogMeansCurrent" value="true" />
+		</jdbcConnection>
+
+		<javaModelGenerator
+			targetProject="${sisarb.mbg.target-project.java}"
+			targetPackage="${sisarb.mbg.target-package.domain}">
+		</javaModelGenerator>
+
+		<sqlMapGenerator
+			targetProject="${sisarb.mbg.target-project.resources}"
+			targetPackage="${sisarb.mbg.target-package.mapper}">
+			<property name="enableSubPackages" value="false" />
+		</sqlMapGenerator>
+
+		<javaClientGenerator type="XMLMAPPER"
+			targetProject="${sisarb.mbg.target-project.java}"
+			targetPackage="${sisarb.mbg.target-package.mapper}">
+			<property name="enableSubPackages" value="false" />
+		</javaClientGenerator>
+
+		<!-- Class in java → domainObjectName ="PersonaCargoAreaMinisterial" -->
+		<table  schema="ARBITRAJE" tableName="MAE_CONFIGURACION" domainObjectName="Configuracion"
+			modelType="flat"
+			 enableCountByExample="true"
+			enableSelectByExample="true" 
+			enableUpdateByExample="true"
+			enableDeleteByExample="true"
+			 enableSelectByPrimaryKey="true"
+			selectByPrimaryKeyQueryId="true"
+			 selectByExampleQueryId="true"
+			enableUpdateByPrimaryKey="true">
+			<property name="useActualColumnNames" value="false" />
+		</table>
+	</context>
+</generatorConfiguration>

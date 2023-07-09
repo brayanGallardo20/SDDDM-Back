@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pe.gob.minjus.sisarb.model.mapper.ParametroConfiguracionMapper">
+
+    <sql id="columnsSelect">
+        PARAMETRO_CONFIGURACION_ID,
+        AMBIENTE_CONFIGURACION,
+        NOMBRE,
+        DETALLE,
+        VALOR,
+        FECHA_CREACION,
+        GRUPO,
+        ESTADO
+    </sql>
+
+    <sql id="columnsInsert">
+        PARAMETRO_CONFIGURACION_ID,
+        AMBIENTE_CONFIGURACION,
+        NOMBRE,
+        DETALLE,
+        VALOR,
+        FECHA_CREACION,
+        GRUPO,
+        ESTADO
+    </sql>
+
+
+    <resultMap id="resultlistPaginated" type="pe.gob.minjus.sisarb.model.domain.ParametroConfiguracion">
+        <id  property="parametroConfiguracionId"        column="PARAMETRO_CONFIGURACION_ID"  />
+        <id  property="ambienteConfiguracion"           column="AMBIENTE_CONFIGURACION"  />
+        <result property="nombre"                       column="NOMBRE" />
+        <result property="detalle"                      column="DETALLE" />
+        <result property="valor"                        column="VALOR" />
+        <result property="fechaCreacion"                column="FECHA_CREACION" />
+    </resultMap>
+
+    <select id="listPaginated" resultMap="resultlistPaginated" parameterType="pe.gob.minjus.sisarb.model.request.ParametroConfiguracionBusquedaRequest">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        FROM GEN_PARAMETRO_CONFIGURACION
+        <include refid="listPaginatedWhere">
+            <property name="parametroConfiguracionId" value="parametroConfiguracionId"/>
+            <property name="ambienteConfiguracion" value="ambienteConfiguracion"/>
+            <property name="nombre" value="nombre"/>
+            <property name="valor" value="valor"/>
+            <property name="fechaCreacion" value="fechaCreacion"/>
+        </include>
+        OFFSET #{filaInicio,jdbcType=INTEGER} ROWS FETCH NEXT #{cantidadPorPagina,jdbcType=INTEGER} ROWS ONLY
+    </select>
+
+    <sql id="listPaginatedWhere">
+        WHERE 1=1
+        <if test="parametroConfiguracionId!=null"> AND PARAMETRO_CONFIGURACION_ID = #{parametroConfiguracionId} </if>
+        <if test="ambienteConfiguracion!=null"> AND AMBIENTE_CONFIGURACION = #{ambienteConfiguracion} </if>
+        <if test="nombre!=null and nombre!=''"> AND REGEXP_REPLACE(TRIM(UPPER(NOMBRE)), ' +', ' ') LIKE '%'||REGEXP_REPLACE(TRIM(UPPER(#{nombre, jdbcType=VARCHAR})), ' +', ' ')||'%' </if>
+        <if test="valor!=null and valor!=''"> AND REGEXP_REPLACE(TRIM(UPPER(VALOR)), ' +', ' ') LIKE '%'||REGEXP_REPLACE(TRIM(UPPER(#{valor, jdbcType=VARCHAR})), ' +', ' ')||'%' </if>
+        <if test="fechaCreacion!=null and fechaCreacion!=''">
+            AND TO_CHAR(FECHA_CREACION, 'dd-mm-yyyy hh24:mi') LIKE '%'||UPPER(#{fechaCreacion})||'%'
+        </if>
+    </sql>
+
+    <!-- Query para calcular el total -->
+    <select id="listPaginatedTotal" resultType="java.lang.Integer" parameterType="pe.gob.minjus.sisarb.model.request.ParametroConfiguracionBusquedaRequest">
+        select count(1) total FROM GEN_PARAMETRO_CONFIGURACION
+        <include refid="listPaginatedWhere">
+            <property name="parametroConfiguracionId" value="parametroConfiguracionId"/>
+            <property name="ambienteConfiguracion" value="ambienteConfiguracion"/>
+            <property name="nombre" value="nombre"/>
+            <property name="valor" value="valor"/>
+            <property name="fechaCreacion" value="fechaCreacion"/>
+        </include>
+    </select>
+
+    <update id="update" parameterType="pe.gob.minjus.sisarb.model.domain.ParametroConfiguracion">
+        UPDATE GEN_PARAMETRO_CONFIGURACION
+        SET
+        AUDIT_FECHA_MODIFICA=sysdate
+        <if test="nombre != null and nombre!=''">,NOMBRE =REGEXP_REPLACE(TRIM(UPPER(#{nombre, jdbcType=VARCHAR})), ' +', ' '), </if>
+        <if test="valor != null and valor!=''">,VALOR =REGEXP_REPLACE(TRIM(UPPER(#{valor, jdbcType=VARCHAR})), ' +', ' '), </if>
+        <if test="detalle != null and detalle!=''">,DETALLE =REGEXP_REPLACE(TRIM(UPPER(#{detalle, jdbcType=VARCHAR})), ' +', ' '), </if>
+        <if test="auditUsuarioModifica != null and auditUsuarioModifica!=''">, AUDIT_USUARIO_MODIFICA=TRIM(UPPER(#{auditUsuarioModifica, jdbcType=VARCHAR})) </if>
+        where PARAMETRO_CONFIGURACION_ID=#{parametroConfiguracionId, jdbcType=INTEGER}
+    </update>
+
+    <select id="findById" resultMap="resultlistPaginated" parameterType="pe.gob.minjus.sisarb.model.domain.ParametroConfiguracion">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        FROM GEN_PARAMETRO_CONFIGURACION
+        WHERE PARAMETRO_CONFIGURACION_ID = #{parametroConfiguracionId, jdbcType=INTEGER}
+        AND AMBIENTE_CONFIGURACION = #{ambienteConfiguracion, jdbcType=INTEGER}
+    </select>
+
+
+    <select id="countByField" resultType="pe.gob.minjus.sisarb.model.domain.ParametroConfiguracion"  >
+        SELECT
+        COUNT(1)
+        FROM GEN_PARAMETRO_CONFIGURACION
+        <include refid="countWhere">
+            <property name="parametroConfiguracionId" value="parametroConfiguracionId"/>
+            <property name="ambienteConfiguracion" value="ambienteConfiguracion"/>
+            <property name="nombre" value="nombre"/>
+            <property name="valor" value="valor"/>
+            <property name="fechaCreacion" value="fechaCreacion"/>
+        </include>
+    </select>
+
+    <sql id="countWhere">
+        WHERE ESTADO=1
+        <if test="parametroConfiguracionId!=null"> AND PARAMETRO_CONFIGURACION_ID = #{parametroConfiguracionId} </if>
+        <if test="ambienteConfiguracion!=null"> AND AMBIENTE_CONFIGURACION = #{ambienteConfiguracion} </if>
+        <if test="nombre!=null and nombre!=''"> AND REGEXP_REPLACE(TRIM(UPPER(NOMBRE)), ' +', ' ') LIKE '%'||REGEXP_REPLACE(TRIM(UPPER(#{nombre, jdbcType=VARCHAR})), ' +', ' ')||'%' </if>
+        <if test="valor!=null and valor!=''"> AND REGEXP_REPLACE(TRIM(UPPER(VALOR)), ' +', ' ') LIKE '%'||REGEXP_REPLACE(TRIM(UPPER(#{valor, jdbcType=VARCHAR})), ' +', ' ')||'%' </if>
+        <if test="fechaCreacion!=null and fechaCreacion!=''">
+            AND TO_CHAR(FECHA_CREACION, 'dd-mm-yyyy hh24:mi') LIKE '%'||UPPER(#{fechaCreacion})||'%'
+        </if>
+    </sql>
+
+</mapper>

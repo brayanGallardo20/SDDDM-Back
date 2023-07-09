@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pe.gob.minjus.sisarb.model.mapper.InstitucionMapper">
+
+    <sql id="columnsSelect">
+        INSTITUCION_ID,
+		RUC,
+		RAZON_SOCIAL,
+		DIRECCION,
+		TELEFONO,
+		CORREO,
+		PAGINA_WEB,
+		UBIGEO_ID,
+		TIPO_OPERADOR_ARBITRAL_ID,
+		HORARIO_LV_INICIO,
+		HORARIO_LV_FIN,
+		HORARIO_SA_INICIO,
+		HORARIO_SA_FIN,
+		ACTIVO,
+        AUDIT_USUARIO_CREACION,
+        AUDIT_FECHA_CREACION,
+        AUDIT_USUARIO_MODIFICA,
+        AUDIT_FECHA_MODIFICA,
+        TO_CHAR(AUDIT_FECHA_CREACION, 'yyyy-mm-dd hh24:mi')  AUDIT_FECHA_CREACION_FORMAT,
+        TO_CHAR(AUDIT_FECHA_MODIFICA, 'yyyy-mm-dd hh24:mi') AUDIT_FECHA_MODIFICA_FORMAT
+    </sql>
+    
+   <sql id="columnsSelectInstitucion">
+            INSTITUCION_ID,
+		RUC,
+		RAZON_SOCIAL,
+		DIRECCION,
+		TELEFONO,
+		CORREO,
+		PAGINA_WEB,
+		UBIGEO_ID,
+		TIPO_OPERADOR_ARBITRAL_ID,
+		HORARIO_LV_INICIO,
+		HORARIO_LV_FIN,
+		HORARIO_SA_INICIO,
+		HORARIO_SA_FIN,
+		ACTIVO,
+        AUDIT_USUARIO_CREACION,
+        AUDIT_FECHA_CREACION,
+        AUDIT_USUARIO_MODIFICA,
+        AUDIT_FECHA_MODIFICA,
+        TO_CHAR(AUDIT_FECHA_CREACION, 'yyyy-mm-dd hh24:mi')  AUDIT_FECHA_CREACION_FORMAT,
+        TO_CHAR(AUDIT_FECHA_MODIFICA, 'yyyy-mm-dd hh24:mi') AUDIT_FECHA_MODIFICA_FORMAT
+    </sql>    
+    
+       <sql id="columnsSelectAllInstitucion">
+            inst.INSTITUCION_ID,
+		    inst.RUC,
+			inst.RAZON_SOCIAL,
+			inst.DIRECCION,
+			inst.TELEFONO,
+			inst.CORREO,
+			inst.PAGINA_WEB,
+			inst.UBIGEO_ID,
+			inst.TIPO_OPERADOR_ARBITRAL_ID,
+			inst.HORARIO_LV_INICIO,
+			inst.HORARIO_LV_FIN,
+			inst.HORARIO_SA_INICIO,
+			inst.HORARIO_SA_FIN,
+			inst.ACTIVO,
+	        inst.AUDIT_USUARIO_CREACION,
+	        inst.AUDIT_FECHA_CREACION,
+	        inst.AUDIT_USUARIO_MODIFICA,
+	        inst.AUDIT_FECHA_MODIFICA,
+	        inst.TO_CHAR(AUDIT_FECHA_CREACION, 'yyyy-mm-dd hh24:mi')  AUDIT_FECHA_CREACION_FORMAT,
+	        inst.TO_CHAR(AUDIT_FECHA_MODIFICA, 'yyyy-mm-dd hh24:mi') AUDIT_FECHA_MODIFICA_FORMAT,
+	        pers.UBIGEO_ID,
+			pers.TIPO_DOCUMENTO_ID,
+			pers.TELEFONO,
+			pers.SEGUNDO_APELLIDO,
+			pers.PRIMER_APELLIDO,
+			pers.PERSONA_ID,
+			pers.NUMERO_DOCUMENTO,
+			pers.NOMBRES,
+			pers.DIRECCION,
+			pers.CORREO
+    </sql>   
+    
+    <sql id="columnsInsertIntitution">
+       INSTITUCION_ID,
+		RUC,
+		RAZON_SOCIAL,
+		DIRECCION,
+		TELEFONO,
+		CORREO,
+		PAGINA_WEB,
+		UBIGEO_ID,
+		TIPO_OPERADOR_ARBITRAL_ID,
+		HORARIO_LV_INICIO,
+		HORARIO_LV_FIN,
+		HORARIO_SA_INICIO,
+		HORARIO_SA_FIN,
+        AUDIT_USUARIO_CREACION,
+        AUDIT_FECHA_CREACION,
+        ACTIVO
+    </sql>  
+    
+            <sql id="columnSelectIntitutionPersona">
+        INSTITUCION_PERSONA_ID,
+		INSTITUCION_ID,
+		PERSONA_ID,
+		PERSONA_CARGO_ID,
+		ACTIVO
+    </sql>  
+    
+     <sql id="columnSelectPersonaNatural">
+		TIPO_DOCUMENTO_ID,
+		TELEFONO,
+		SEGUNDO_APELLIDO,
+		PRIMER_APELLIDO,
+		PERSONA_ID,
+		NUMERO_DOCUMENTO,
+		NOMBRES,
+		DIRECCION,
+		CORREO,
+		ACTIVO
+    </sql>         
+
+    <resultMap id="resultlistPaginated" type="pe.gob.minjus.sisarb.model.response.InstitucionResponse">
+        <id  property="institucionId"                   column="INSTITUCION_ID"  />
+        <result property="ruc"                          column="RUC" />
+        <result property="razonSocial"                       column="RAZON_SOCIAL" />
+        <result property="direccion"                       column="DIRECCION" />
+        <result property="telefono"                       column="TELEFONO" />
+        <result property="correo"                       column="CORREO" />
+        <result property="paginaWeb"                       column="PAGINA_WEB" />
+        <result property="tipoOperadorArbitralId"       column="TIPO_OPERADOR_ARBITRAL_ID" />
+        <result property="horarioLvInicio"              column="HORARIO_LV_INICIO" />
+        <result property="horarioLvFin"              column="HORARIO_LV_FIN" />
+        <result property="horarioSaInicio"              column="HORARIO_SA_INICIO" />
+        <result property="horarioSaFin"              column="HORARIO_SA_FIN" />
+        <result property="correo"                       column="CORREO" />
+        <result property="ubigeoId"                     column="UBIGEO_ID" />
+        <result property="activo"                       column="ACTIVO" />
+        <result property="auditUsuarioCreacion"         column="AUDIT_USUARIO_CREACION" />
+        <result property="auditFechaCreacion"           column="AUDIT_FECHA_CREACION" />
+        <result property="auditUsuarioModifica"         column="AUDIT_USUARIO_MODIFICA" />
+        <result property="auditFechaModifica"           column="AUDIT_FECHA_MODIFICA" />
+        <result property="auditFechaCreacionFormat"     column="AUDIT_FECHA_CREACION_FORMAT" />
+        <result property="auditFechaModificaFormat"     column="AUDIT_FECHA_MODIFICA_FORMAT" />
+    </resultMap>
+    
+    <resultMap id="resultListInstitucion" type="pe.gob.minjus.sisarb.model.domain.Institucion">
+        <id  property="institucionId"                   column="INSTITUCION_ID"  />
+        <result property="ruc"                          column="RUC" />
+        <result property="razonSocial"                       column="RAZON_SOCIAL" />
+        <result property="direccion"                       column="DIRECCION" />
+        <result property="telefono"                       column="TELEFONO" />
+        <result property="correo"                       column="CORREO" />
+        <result property="paginaWeb"                       column="PAGINA_WEB" />
+        <result property="tipoOperadorArbitralId"       column="TIPO_OPERADOR_ARBITRAL_ID" />
+        <result property="horarioLvInicio"              column="HORARIO_LV_INICIO" />
+        <result property="horarioLvFin"              column="HORARIO_LV_FIN" />
+        <result property="horarioSaInicio"              column="HORARIO_SA_INICIO" />
+        <result property="horarioSaFin"              column="HORARIO_SA_FIN" />
+        <result property="correo"                       column="CORREO" />
+        <result property="ubigeoId"                     column="UBIGEO_ID" />
+        <result property="activo"                       column="ACTIVO" />
+        <result property="auditUsuarioCreacion"         column="AUDIT_USUARIO_CREACION" />
+        <result property="auditFechaCreacion"           column="AUDIT_FECHA_CREACION" />
+        <result property="auditUsuarioModifica"         column="AUDIT_USUARIO_MODIFICA" />
+        <result property="auditFechaModifica"           column="AUDIT_FECHA_MODIFICA" />
+        <result property="auditFechaCreacionFormat"     column="AUDIT_FECHA_CREACION_FORMAT" />
+        <result property="auditFechaModificaFormat"     column="AUDIT_FECHA_MODIFICA_FORMAT" />           
+    </resultMap>       
+
+    <select id="listPaginated" resultMap="resultlistPaginated" parameterType="pe.gob.minjus.sisarb.model.request.InstitucionBusquedaRequest">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        FROM TRS_INSTITUCION
+        <include refid="listPaginatedWhere">
+            <property name="razonSocial" value="razonSocial"/>
+            <property name="ruc" value="ruc"/>
+            <property name="tipoOperadorArbitralId" value="tipoOperadorArbitralId"/>
+        </include>
+        OFFSET #{filaInicio,jdbcType=INTEGER} ROWS FETCH NEXT #{cantidadPorPagina,jdbcType=INTEGER} ROWS ONLY
+    </select>
+    
+      <resultMap id="resultFind" type="pe.gob.minjus.sisarb.model.domain.Institucion">                     
+        <result property="institucionId"        column="institucionId" /> 
+      </resultMap>      
+
+      <resultMap id="resultFindPersonaNatural" type="pe.gob.minjus.sisarb.model.domain.PersonaNatural">                     
+        <result property="personaNaturalId"       column="PERSONA_ID" /> 
+        <result property="tipoDocumentoId"        column="TIPO_DOCUMENTO_ID" /> 
+        <result property="nombre"                 column="NOMBRES" /> 
+        <result property="apellidoPaterno"        column="PRIMER_APELLIDO" /> 
+        <result property="apellidoMaterno"        column="SEGUNDO_APELLIDO" /> 
+        <result property="numeroDocumento"        column="NUMERO_DOCUMENTO" /> 
+        <result property="correo"        column="CORREO" /> 
+         <result property="telefono"        column="TELEFONO" /> 
+        <result property="activo"        column="ACTIVO" /> 
+      </resultMap> 
+      
+    <sql id="listPaginatedWhere">
+        WHERE ACTIVO=1
+        <if test="razonSocial!=null and razonSocial!=''"> AND TRIM(UPPER(RAZON_SOCIAL)) LIKE '%'|| REGEXP_REPLACE(TRIM(UPPER(#{razonSocial})), ' +', ' ')||'%'  </if>
+       <if test="ruc!=null and ruc!=''"> AND TRIM(RUC) LIKE '%'|| REGEXP_REPLACE(TRIM(UPPER(#{ruc})), ' +', ' ')||'%' </if>
+        <if test="tipoOperadorArbitralId!=null and tipoOperadorArbitralId!=''"> AND  TIPO_OPERADOR_ARBITRAL_ID = #{tipoOperadorArbitralId} </if>
+    </sql>
+
+    <!-- Query para calcular el total -->
+    <select id="listPaginatedTotal" resultType="java.lang.Integer" parameterType="pe.gob.minjus.sisarb.model.request.EtapaArbitralBusquedaRequest">
+        select count(1) total FROM TRS_INSTITUCION
+        <include refid="listPaginatedWhere">
+            <property name="razonSocial" value="razonSocial"/>
+            <property name="ruc" value="ruc"/>
+        </include>
+    </select>
+
+    <update id="update" parameterType="pe.gob.minjus.sisarb.model.domain.Institucion">
+        update TRS_INSTITUCION
+        set             
+			RUC=#{ruc}, 
+			RAZON_SOCIAL=UPPER(#{razonSocial}), 
+			DIRECCION=UPPER(#{direccion}),  
+			TELEFONO=#{telefono}, 
+			CORREO=UPPER(#{correo}), 
+			PAGINA_WEB=UPPER(#{paginaWeb}),  
+			UBIGEO_ID=#{ubigeoId}, 
+			TIPO_OPERADOR_ARBITRAL_ID=#{tipoOperadorArbitralId}, 
+			HORARIO_LV_INICIO=#{horarioLvInicio}, 
+			HORARIO_LV_FIN=#{horarioLvFin}, 
+			HORARIO_SA_INICIO=#{horarioSaInicio}, 
+			HORARIO_SA_FIN=#{horarioSaFin},                                                         
+            AUDIT_FECHA_MODIFICA= SYSDATE,
+			AUDIT_USUARIO_MODIFICA=TRIM(UPPER(#{auditUsuarioModifica, jdbcType=VARCHAR}))       
+        where INSTITUCION_ID=#{institucionId}
+    </update>  
+   
+    <insert id="insertInstitution"  parameterType="pe.gob.minjus.sisarb.model.domain.Institucion">
+      
+       <selectKey keyProperty="institucionId" order="BEFORE" resultType="java.lang.Integer">
+            SELECT SEQ_TRS_INSTITUCION.NEXTVAL FROM DUAL
+       </selectKey>
+        insert into TRS_INSTITUCION (<include refid="columnsInsertIntitution" />) values        
+        ( 
+         #{institucionId, jdbcType=NUMERIC},
+          #{ruc, jdbcType=VARCHAR},
+          UPPER(#{razonSocial, jdbcType=VARCHAR}) ,
+          UPPER(#{direccion, jdbcType=VARCHAR}) ,
+          UPPER(#{telefono, jdbcType=VARCHAR}) ,
+          UPPER(#{correo, jdbcType=VARCHAR}) ,  
+          UPPER(#{paginaWeb, jdbcType=NUMERIC}),
+          #{ubigeoId, jdbcType=VARCHAR} ,
+          #{tipoOperadorArbitralId, jdbcType=NUMERIC} ,  
+          #{horarioLvInicio, jdbcType=VARCHAR} ,   
+          #{horarioLvFin, jdbcType=VARCHAR}, 
+          #{horarioSaInicio, jdbcType=VARCHAR}, 
+          #{horarioSaFin, jdbcType=VARCHAR},                                                                          
+          UPPER(#{auditUsuarioCreacion, jdbcType=VARCHAR}),
+          SYSDATE,
+          1 
+        )          
+    </insert>
+    
+    <update id="delete" parameterType="java.lang.Integer">
+        update TRS_INSTITUCION
+        set            
+            ACTIVO = 0,
+            AUDIT_FECHA_MODIFICA= SYSDATE,
+			AUDIT_USUARIO_MODIFICA=TRIM(UPPER(#{auditUsuarioModifica, jdbcType=VARCHAR}))            
+        where INSTITUCION_ID = '${institucionId}'
+    </update>   
+
+    <select id="findById" resultMap="resultListInstitucion" parameterType="java.lang.Integer">
+        SELECT
+        <include refid="columnsSelectInstitucion">
+        </include>
+        FROM TRS_INSTITUCION
+        WHERE ACTIVO=1 AND INSTITUCION_ID = #{idInstitucion, jdbcType=INTEGER}
+    </select>
+    
+    <select id="findByName" resultMap="resultFind" >
+        SELECT <include refid="columnsSelect" /> FROM TRS_INSTITUCION WHERE ACTIVO = 1 AND RUC=#{ruc}
+    </select>     
+
+   <select id="findByPersonaNatural" resultMap="resultFindPersonaNatural" parameterType="java.lang.Integer">
+        SELECT <include refid="columnSelectPersonaNatural" /> FROM TRS_PERSONA WHERE ACTIVO = 1 AND PERSONA_ID = #{personaId, jdbcType=INTEGER}
+    </select>  
+        
+</mapper>

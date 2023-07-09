@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pe.gob.minjus.sisarb.model.mapper.SedeEspecialidadMapper">
+
+    <sql id="columnsSelect">
+        SE.SEDE_ESPECIALIDAD_ID,
+        SE.SEDE_ID,
+        SE.ESPECIALIDAD_ID,
+        AUDIT_USUARIO_CREACION,
+        AUDIT_FECHA_CREACION,
+        AUDIT_USUARIO_MODIFICA,
+        AUDIT_FECHA_MODIFICA,
+        TO_CHAR(AUDIT_FECHA_CREACION, 'yyyy-mm-dd hh24:mi')  AUDIT_FECHA_CREACION_FORMAT,
+        TO_CHAR(AUDIT_FECHA_MODIFICA, 'yyyy-mm-dd hh24:mi') AUDIT_FECHA_MODIFICA_FORMAT
+    </sql>
+
+    <sql id="columnsInsert">
+        SEDE_ESPECIALIDAD_ID,
+        SEDE_ID,
+        ESPECIALIDAD_ID,
+        ACTIVO,
+        AUDIT_USUARIO_CREACION,
+        AUDIT_FECHA_CREACION
+    </sql>
+
+
+    <resultMap id="resultList" type="pe.gob.minjus.sisarb.model.domain.SedeEspecialidad">
+        <id  property="sedeEspecialidadId"              column="SEDE_ESPECIALIDAD_ID"  />
+        <result property="sedeId"                       column="SEDE_ID" />
+        <result property="especialidadId"               column="ESPECIALIDAD_ID" />
+        <result property="auditUsuarioCreacion"         column="AUDIT_USUARIO_CREACION" />
+        <result property="auditFechaCreacion"           column="AUDIT_FECHA_CREACION" />
+        <result property="auditUsuarioModifica"         column="AUDIT_USUARIO_MODIFICA" />
+        <result property="auditFechaModifica"           column="AUDIT_FECHA_MODIFICA" />
+
+        <result property="auditFechaCreacionFormat"     column="AUDIT_FECHA_CREACION_FORMAT" />
+        <result property="auditFechaModificaFormat"     column="AUDIT_FECHA_MODIFICA_FORMAT" />
+    </resultMap>
+
+    <select id="findBySede" resultMap="resultList">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        FROM TRS_SEDE_ESPECIALIDAD SE
+        WHERE  SE.SEDE_ID=#{sedeId}
+        AND SE.ACTIVO=1
+    </select>
+
+    <insert id="save"  parameterType="pe.gob.minjus.sisarb.model.domain.SedeEspecialidad">
+        <selectKey keyProperty="sedeEspecialidadId" order="BEFORE" resultType="java.lang.Integer">
+            SELECT SEQ_TRS_SEDE_ESPECIALIDAD.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TRS_SEDE_ESPECIALIDAD (<include refid="columnsInsert" />) values
+        (
+        #{sedeEspecialidadId, jdbcType=INTEGER},
+        #{sedeId, jdbcType=INTEGER},
+        #{especialidadId, jdbcType=INTEGER},
+        1,
+        TRIM(UPPER(#{auditUsuarioCreacion,jdbcType=VARCHAR})),
+        sysdate
+        )
+    </insert>
+
+    <update id="update" parameterType="pe.gob.minjus.sisarb.model.domain.SedeEspecialidad">
+        UPDATE TRS_SEDE_ESPECIALIDAD
+        SET
+        AUDIT_FECHA_MODIFICA = sysdate,
+        AUDIT_USUARIO_MODIFICA = TRIM(UPPER(#{auditUsuarioModifica,jdbcType=VARCHAR})),
+        ACTIVO=#{activo, jdbcType=INTEGER}
+        where SEDE_ESPECIALIDAD_ID=#{sedeEspecialidadId, jdbcType=INTEGER}
+    </update>
+
+    <update id="deleteById">
+        UPDATE TRS_SEDE_ESPECIALIDAD
+        SET
+        AUDIT_FECHA_MODIFICA = sysdate,
+        AUDIT_USUARIO_MODIFICA = TRIM(UPPER(#{auditUsuarioModifica,jdbcType=VARCHAR})),
+        ACTIVO=0
+        where SEDE_ESPECIALIDAD_ID=#{sedeEspecialidadId, jdbcType=INTEGER}
+    </update>
+
+    <select id="findById" resultMap="resultList">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        FROM TRS_SEDE_ESPECIALIDAD SE
+        WHERE  SE.SEDE_ESPECIALIDAD_ID=#{sedeId}
+        AND SE.ACTIVO=1
+    </select>
+</mapper>

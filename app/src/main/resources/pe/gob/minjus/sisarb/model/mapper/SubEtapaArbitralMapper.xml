@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pe.gob.minjus.sisarb.model.mapper.SubEtapaArbitralMapper">
+
+    <sql id="columnsSelect">
+        SEA.SUB_ETAPA_ARBITRAL_ID,
+        SEA.ETAPA_ARBITRAL_ID,
+        SEA.NOMBRE,
+        SEA.ORDEN,
+        SEA.AUDIT_USUARIO_CREACION,
+        SEA.AUDIT_FECHA_CREACION,
+        SEA.AUDIT_USUARIO_MODIFICA,
+        SEA.AUDIT_FECHA_MODIFICA,
+
+        TO_CHAR(SEA.AUDIT_FECHA_CREACION, 'yyyy-mm-dd hh24:mi')  AUDIT_FECHA_CREACION_FORMAT,
+        TO_CHAR(SEA.AUDIT_FECHA_MODIFICA, 'yyyy-mm-dd hh24:mi') AUDIT_FECHA_MODIFICA_FORMAT
+    </sql>
+
+    <sql id="columnsInsert">
+        SUB_ETAPA_ARBITRAL_ID,
+        ETAPA_ARBITRAL_ID,
+        NOMBRE,
+        ORDEN,
+        ACTIVO,
+        AUDIT_USUARIO_CREACION,
+        AUDIT_FECHA_CREACION
+    </sql>
+
+
+    <resultMap id="resultlistPaginated" type="pe.gob.minjus.sisarb.model.domain.SubEtapaArbitral">
+        <id  property="subEtapaArbitralId"              column="SUB_ETAPA_ARBITRAL_ID"  />
+        <result property="etapaArbitralId"              column="ETAPA_ARBITRAL_ID" />
+        <result property="nombre"                       column="NOMBRE" />
+        <result property="orden"                       column="ORDEN" />
+        <result property="auditUsuarioCreacion"         column="AUDIT_USUARIO_CREACION" />
+        <result property="auditFechaCreacion"           column="AUDIT_FECHA_CREACION" />
+        <result property="auditUsuarioModifica"         column="AUDIT_USUARIO_MODIFICA" />
+        <result property="auditFechaModifica"           column="AUDIT_FECHA_MODIFICA" />
+
+        <result property="auditFechaCreacionFormat"     column="AUDIT_FECHA_CREACION_FORMAT" />
+        <result property="auditFechaModificaFormat"     column="AUDIT_FECHA_MODIFICA_FORMAT" />
+    </resultMap>
+
+
+    <select id="listPaginated" resultMap="resultlistPaginated" parameterType="pe.gob.minjus.sisarb.model.request.SubEtapaArbitralBusquedaRequest">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        FROM MAE_SUB_ETAPA_ARBITRAL SEA LEFT JOIN MAE_ETAPA_ARBITRAL EA ON SEA.ETAPA_ARBITRAL_ID = EA.ETAPA_ARBITRAL_ID
+        <include refid="listPaginatedWhere">
+            <property name="etapaArbitralId" value="etapaArbitralId"/>
+            <property name="nombre" value="nombre"/>
+            <property name="auditUsuarioCreacion" value="auditUsuarioCreacion"/>
+            <property name="auditFechaCreacion" value="auditFechaCreacion"/>
+            <property name="auditUsuarioModifica" value="auditUsuarioModifica"/>
+            <property name="auditFechaModifica" value="auditFechaModifica"/>
+            <property name="nombreEtapaArbitral" value="nombreEtapaArbitral"/>
+
+        </include>
+        OFFSET #{filaInicio,jdbcType=INTEGER} ROWS FETCH NEXT #{cantidadPorPagina,jdbcType=INTEGER} ROWS ONLY
+    </select>
+
+    <sql id="listPaginatedWhere">
+        WHERE SEA.ACTIVO=1
+        <if test="etapaArbitralId!=null"> AND SEA.ETAPA_ARBITRAL_ID = #{etapaArbitralId} </if>
+        <if test="nombre != null and nombre!=''"> AND SEA.NOMBRE  LIKE '%'|| REGEXP_REPLACE(TRIM(UPPER(#{nombre})), ' +', ' ')||'%' </if>
+        <if test="auditUsuarioCreacion!=null and auditUsuarioCreacion!=''">
+            AND TRIM(UPPER(SEA.AUDIT_USUARIO_CREACION)) LIKE '%'||TRIM(UPPER(#{auditUsuarioCreacion}))||'%'
+        </if>
+        <if test="auditFechaCreacion!=null and auditFechaCreacion!=''">
+            AND TO_CHAR(SEA.AUDIT_FECHA_CREACION, 'yyyy-mm-dd hh24:mi:ss') LIKE '%'||#{auditFechaCreacion}||'%'
+        </if>
+        <if test="auditUsuarioModifica!=null and auditUsuarioModifica!=''">
+            AND TRIM(UPPER(SEA.AUDIT_USUARIO_MODIFICA)) LIKE '%'||TRIM(UPPER(#{auditUsuarioModifica}))||'%'
+        </if>
+        <if test="auditFechaModifica!=null and auditFechaModifica!=''">
+            AND TO_CHAR(SEA.AUDIT_FECHA_MODIFICA, 'yyyy-mm-dd hh24:mi:ss') LIKE '%'||#{auditFechaModifica}||'%'
+        </if>
+        <if test="nombreEtapaArbitral != null and nombreEtapaArbitral!=''"> AND EA.NOMBRE  LIKE '%'|| REGEXP_REPLACE(TRIM(UPPER(#{nombreEtapaArbitral})), ' +', ' ')||'%' </if>
+    </sql>
+
+    <!-- Query para calcular el total -->
+    <select id="listPaginatedTotal" resultType="java.lang.Integer" parameterType="pe.gob.minjus.sisarb.model.request.SubEtapaArbitralBusquedaRequest">
+        select count(1) total FROM MAE_SUB_ETAPA_ARBITRAL SEA LEFT JOIN MAE_ETAPA_ARBITRAL EA ON SEA.ETAPA_ARBITRAL_ID = EA.ETAPA_ARBITRAL_ID
+        <include refid="listPaginatedWhere">
+            <property name="etapaArbitralId" value="etapaArbitralId"/>
+            <property name="nombre" value="nombre"/>
+            <property name="auditUsuarioCreacion" value="auditUsuarioCreacion"/>
+            <property name="auditFechaCreacion" value="auditFechaCreacion"/>
+            <property name="auditUsuarioModifica" value="auditUsuarioModifica"/>
+            <property name="auditFechaModifica" value="auditFechaModifica"/>
+        </include>
+    </select>
+
+    <insert id="save"  parameterType="pe.gob.minjus.sisarb.model.domain.SubEtapaArbitral">
+        <selectKey keyProperty="subEtapaArbitralId" order="BEFORE" resultType="java.lang.Integer">
+            SELECT SEQ_MAE_SUB_ETAPA_ARBITRAL.NEXTVAL FROM DUAL
+        </selectKey>
+
+        INSERT INTO MAE_SUB_ETAPA_ARBITRAL (<include refid="columnsInsert" />) values
+        (
+        #{subEtapaArbitralId, jdbcType=INTEGER},
+        #{etapaArbitralId, jdbcType=INTEGER},
+        REGEXP_REPLACE(TRIM(UPPER(#{nombre, jdbcType=VARCHAR})), ' +', ' '),
+        #{orden, jdbcType=INTEGER},
+        1,
+        TRIM(UPPER(#{auditUsuarioCreacion,jdbcType=VARCHAR})),
+        sysdate)
+    </insert>
+
+    <update id="update" parameterType="pe.gob.minjus.sisarb.model.domain.SubEtapaArbitral">
+        UPDATE MAE_SUB_ETAPA_ARBITRAL
+        SET
+        AUDIT_FECHA_MODIFICA=sysdate
+        <if test="etapaArbitralId !=null">,ETAPA_ARBITRAL_ID =#{etapaArbitralId, jdbcType=INTEGER} </if>
+        <if test="nombre != null and nombre!=''">,NOMBRE =REGEXP_REPLACE(TRIM(UPPER(#{nombre, jdbcType=VARCHAR})), ' +', ' ') </if>
+        <if test="orden != null">,ORDEN =#{orden, jdbcType=INTEGER} </if>
+        <if test="auditUsuarioModifica != null and auditUsuarioModifica!=''">, AUDIT_USUARIO_MODIFICA=TRIM(UPPER(#{auditUsuarioModifica, jdbcType=VARCHAR})) </if>
+        where SUB_ETAPA_ARBITRAL_ID=#{subEtapaArbitralId, jdbcType=INTEGER}
+    </update>
+
+    <select id="findById" resultMap="resultlistPaginated" parameterType="java.lang.Integer">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        FROM MAE_SUB_ETAPA_ARBITRAL SEA
+        WHERE SEA.ACTIVO=1 AND SEA.SUB_ETAPA_ARBITRAL_ID = #{id, jdbcType=INTEGER}
+    </select>
+
+    <update id="deleteById" parameterType="java.lang.Integer">
+        UPDATE MAE_SUB_ETAPA_ARBITRAL
+        SET
+        ACTIVO=0
+        where SUB_ETAPA_ARBITRAL_ID=#{id, jdbcType=INTEGER}
+    </update>
+
+
+    <select id="countByField" resultType="java.lang.Integer"  >
+        SELECT
+        COUNT(1)
+        FROM MAE_SUB_ETAPA_ARBITRAL SEA
+        <include refid="countWhere">
+            <property name="nombre" value="nombre"/>
+            <property name="orden" value="orden"/>
+            <property name="etapaArbitralId" value="etapaArbitralId"/>
+        </include>
+    </select>
+
+    <sql id="countWhere">
+        WHERE SEA.ACTIVO=1
+        <if test="nombre != null and nombre!=''"> AND SEA.NOMBRE  LIKE '%'|| REGEXP_REPLACE(TRIM(UPPER(#{nombre})), ' +', ' ')||'%' </if>
+        <if test="orden!=null"> AND SEA.ORDEN=#{orden} </if>
+        <if test="etapaArbitralId!=null"> AND SEA.ETAPA_ARBITRAL_ID=#{etapaArbitralId} </if>
+    </sql>
+    
+</mapper>

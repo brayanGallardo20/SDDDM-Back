@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pe.gob.minjus.sisarb.model.mapper.TablaMapper">
+
+    <resultMap id="resultSelect" type="pe.gob.minjus.sisarb.model.domain.Tabla">
+        <result column="NOMBRE" jdbcType="VARCHAR" property="nombre" />
+    </resultMap>
+
+    <select id="listTabla" resultMap="resultSelect" parameterType="java.lang.String" >
+        SELECT table_name NOMBRE
+        FROM all_tables
+        WHERE OWNER=#{databaseOwner}
+        AND table_name!='AUD_AUDITORIA'
+        ORDER BY table_name
+    </select>
+
+</mapper>

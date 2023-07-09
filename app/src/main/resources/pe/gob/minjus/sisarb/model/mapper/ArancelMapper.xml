@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="pe.gob.minjus.sisarb.model.mapper.ArancelMapper">
+
+	<sql id="columnsSelect">
+		ARANCEL_ID,
+		SERVICIO,
+		REQUISITO,
+		PLAZO_ATENCION,
+		INSTITUCION_ID,
+		DERECHO_PAGO_UIT,
+		ACTIVO,
+		AUDIT_USUARIO_CREACION,
+		AUDIT_FECHA_CREACION,
+		AUDIT_USUARIO_MODIFICA,
+		AUDIT_FECHA_MODIFICA,
+		TO_CHAR(AUDIT_FECHA_CREACION, 'yyyy-mm-dd hh24:mi')
+		AUDIT_FECHA_CREACION_FORMAT,
+		TO_CHAR(AUDIT_FECHA_MODIFICA, 'yyyy-mm-dd
+		hh24:mi')
+		AUDIT_FECHA_MODIFICA_FORMAT
+	</sql>
+
+	<sql id="columnsSelectArancel">
+		ARANCEL_ID,
+		SERVICIO,
+		REQUISITO,
+		PLAZO_ATENCION,
+		INSTITUCION_ID,
+		DERECHO_PAGO_UIT,
+		ACTIVO,
+		AUDIT_USUARIO_CREACION,
+		AUDIT_FECHA_CREACION,
+		AUDIT_USUARIO_MODIFICA,
+		AUDIT_FECHA_MODIFICA,
+		TO_CHAR(AUDIT_FECHA_CREACION, 'yyyy-mm-dd
+		hh24:mi')
+		AUDIT_FECHA_CREACION_FORMAT,
+		TO_CHAR(AUDIT_FECHA_MODIFICA,
+		'yyyy-mm-dd
+		hh24:mi')
+		AUDIT_FECHA_MODIFICA_FORMAT
+	</sql>
+
+
+	<sql id="columnsInsert">
+		ARANCEL_ID,
+		SERVICIO,
+		REQUISITO,
+		PLAZO_ATENCION,
+		INSTITUCION_ID,
+		DERECHO_PAGO_UIT,
+		AUDIT_USUARIO_CREACION,
+		AUDIT_FECHA_CREACION,
+		ACTIVO
+	</sql>
+
+	<resultMap id="resultlistPaginated"
+		type="pe.gob.minjus.sisarb.model.response.ArancelResponse">
+		<id property="arancelId" column="ARANCEL_ID" />
+		<result property="servicio" column="SERVICIO" />
+		<result property="requisito" column="REQUISITO" />
+		<result property="plazoAtencion" column="PLAZO_ATENCION" />
+		<result property="institucionId" column="INSTITUCION_ID" />
+		<result property="derechoPagoUit" column="DERECHO_PAGO_UIT" />
+		<result property="activo" column="ACTIVO" />
+		<result property="auditUsuarioCreacion"
+			column="AUDIT_USUARIO_CREACION" />
+		<result property="auditFechaCreacion"
+			column="AUDIT_FECHA_CREACION" />
+		<result property="auditUsuarioModifica"
+			column="AUDIT_USUARIO_MODIFICA" />
+		<result property="auditFechaModifica"
+			column="AUDIT_FECHA_MODIFICA" />
+		<result property="auditFechaCreacionFormat"
+			column="AUDIT_FECHA_CREACION_FORMAT" />
+		<result property="auditFechaModificaFormat"
+			column="AUDIT_FECHA_MODIFICA_FORMAT" />
+	</resultMap>
+
+	<resultMap id="resultListArancel"
+		type="pe.gob.minjus.sisarb.model.domain.Arancel">
+		<id property="arancelId" column="ARANCEL_ID" />
+		<result property="servicio" column="SERVICIO" />
+		<result property="requisito" column="REQUISITO" />
+		<result property="plazoAtencion" column="PLAZO_ATENCION" />
+		<result property="institucionId" column="INSTITUCION_ID" />
+		<result property="derechoPagoUit" column="DERECHO_PAGO_UIT" />
+		<result property="auditUsuarioCreacion"
+			column="AUDIT_USUARIO_CREACION" />
+		<result property="auditFechaCreacion"
+			column="AUDIT_FECHA_CREACION" />
+		<result property="auditUsuarioModifica"
+			column="AUDIT_USUARIO_MODIFICA" />
+		<result property="auditFechaModifica"
+			column="AUDIT_FECHA_MODIFICA" />
+		<result property="auditFechaCreacionFormat"
+			column="AUDIT_FECHA_CREACION_FORMAT" />
+		<result property="auditFechaModificaFormat"
+			column="AUDIT_FECHA_MODIFICA_FORMAT" />
+	</resultMap>
+
+	<select id="listPaginated" resultMap="resultlistPaginated"
+		parameterType="pe.gob.minjus.sisarb.model.request.ArancelBusquedaRequest">
+		SELECT
+		<include refid="columnsSelect">
+		</include>
+		FROM TRS_ARANCEL
+		<include refid="listPaginatedWhere">
+			<property name="institucionId" value="institucionId" />
+			<property name="servicio" value="servicio" />
+		</include>
+		OFFSET #{filaInicio,jdbcType=INTEGER} ROWS FETCH NEXT
+		#{cantidadPorPagina,jdbcType=INTEGER} ROWS ONLY
+	</select>
+
+	<resultMap id="resultFind"
+		type="pe.gob.minjus.sisarb.model.domain.Institucion">
+		<result property="institucionId" column="institucionId" />
+	</resultMap>
+
+	<sql id="listPaginatedWhere">
+		WHERE ACTIVO=1
+		<if test="institucionId!=null and institucionId!=''"> AND INSTITUCION_ID = #{institucionId} </if>
+		<if test="servicio!=null and servicio!=''"> AND TRIM(UPPER(SERVICIO)) LIKE '%'||TRIM(UPPER(#{servicio}))||'%'  </if>
+	</sql> 
+
+	<!-- Query para calcular el total -->
+	<select id="listPaginatedTotal" resultType="java.lang.Integer"
+		parameterType="pe.gob.minjus.sisarb.model.request.ArancelBusquedaRequest">
+		select count(1) total FROM TRS_ARANCEL
+		<include refid="listPaginatedWhere">
+			<property name="institucionId" value="institucionId" />
+			<property name="servicio" value="servicio" />
+		</include>
+	</select>
+
+	<update id="update"
+		parameterType="pe.gob.minjus.sisarb.model.domain.Arancel">
+		update TRS_ARANCEL
+		set
+		SERVICIO = #{servicio},
+		REQUISITO =
+		#{requisito} ,
+		PLAZO_ATENCION = #{plazoAtencion},
+		DERECHO_PAGO_UIT =
+		#{derechoPagoUit},
+		AUDIT_FECHA_MODIFICA= SYSDATE,
+		AUDIT_USUARIO_MODIFICA=TRIM(UPPER(#{auditUsuarioModifica,
+		jdbcType=VARCHAR}))
+		where ARANCEL_ID=#{arancelId}
+	</update>
+
+	<insert id="insert"
+		parameterType="pe.gob.minjus.sisarb.model.domain.Arancel">
+
+		<selectKey keyProperty="arancelId" order="BEFORE"
+			resultType="java.lang.Integer">
+			SELECT SEQ_TRS_ARANCEL.NEXTVAL FROM DUAL
+		</selectKey>
+		insert into TRS_ARANCEL (
+		<include refid="columnsInsert" />
+		) values
+		(
+		#{arancelId, jdbcType=NUMERIC},
+		#{servicio,
+		jdbcType=VARCHAR},
+		#{requisito, jdbcType=VARCHAR} ,
+		#{plazoAtencion, jdbcType=VARCHAR} ,
+		#{institucionId, jdbcType=VARCHAR} ,
+		#{derechoPagoUit,
+		jdbcType=VARCHAR} ,
+		UPPER(#{auditUsuarioCreacion, jdbcType=VARCHAR}),
+		SYSDATE,
+		1
+		)
+	</insert>
+
+	<update id="delete" parameterType="java.lang.Integer">
+		update TRS_ARANCEL
+		set
+		ACTIVO =
+		0,
+		AUDIT_FECHA_MODIFICA= SYSDATE,
+		AUDIT_USUARIO_MODIFICA=TRIM(UPPER(#{auditUsuarioModifica,
+		jdbcType=VARCHAR}))
+		where ARANCEL_ID = '${arancelId}'
+	</update>
+
+	<select id="findById" resultMap="resultListArancel"
+		parameterType="java.lang.Integer">
+		SELECT
+		<include refid="columnsSelectArancel">
+		</include>
+		FROM TRS_ARANCEL
+		WHERE ACTIVO=1 AND ARANCEL_ID = #{arancelId,
+		jdbcType=INTEGER}
+	</select>
+
+</mapper>

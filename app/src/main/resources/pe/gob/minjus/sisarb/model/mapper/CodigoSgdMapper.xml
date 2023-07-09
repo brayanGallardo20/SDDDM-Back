@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pe.gob.minjus.sisarb.model.mapper.CodigoSgdMapper">
+
+    <sql id="columnsSelect">
+        CODIGO_SGD_ID,
+        EXPEDIENTE_ID,
+        ASUNTO,
+        FECHA_EMISION,
+        CELULAR,
+        REMITENTE,
+        CORREO,
+        AUDIT_USUARIO_CREACION,
+        AUDIT_FECHA_CREACION,
+        AUDIT_USUARIO_MODIFICA,
+        AUDIT_FECHA_MODIFICA,
+
+        TO_CHAR(FECHA_EMISION, 'yyyy-mm-dd')  FECHA_EMISION_FORMAT,
+        TO_CHAR(AUDIT_FECHA_CREACION, 'yyyy-mm-dd hh24:mi')  AUDIT_FECHA_CREACION_FORMAT,
+        TO_CHAR(AUDIT_FECHA_MODIFICA, 'yyyy-mm-dd hh24:mi') AUDIT_FECHA_MODIFICA_FORMAT
+    </sql>
+
+    <sql id="columnsInsert">
+        CODIGO_SGD_ID,
+        EXPEDIENTE_ID,
+        ASUNTO,
+        FECHA_EMISION,
+        CELULAR,
+        REMITENTE,
+        CORREO,
+        ESTADO,
+        AUDIT_USUARIO_CREACION,
+        AUDIT_FECHA_CREACION
+    </sql>
+
+    <resultMap id="resultlistPaginated" type="pe.gob.minjus.sisarb.model.domain.CodigoSgd">
+        <id  property="codigoSgdId"                     column="CODIGO_SGD_ID"  />
+        <result property="expedienteId"                 column="EXPEDIENTE_ID" />
+        <result property="asunto"                       column="ASUNTO" />
+        <result property="fechaEmision"                 column="FECHA_EMISION"  javaType="java.time.LocalDate"/>
+        <result property="celular"                      column="CELULAR" />
+        <result property="remitente"                    column="REMITENTE" />
+        <result property="correo"                       column="CORREO" />
+        <result property="auditUsuarioCreacion"         column="AUDIT_USUARIO_CREACION" />
+        <result property="auditFechaCreacion"           column="AUDIT_FECHA_CREACION" />
+        <result property="auditUsuarioModifica"         column="AUDIT_USUARIO_MODIFICA" />
+        <result property="auditFechaModifica"           column="AUDIT_FECHA_MODIFICA" />
+
+        <result property="fechaEmisionFormat"           column="FECHA_EMISION_FORMAT" />
+        <result property="auditFechaCreacionFormat"     column="AUDIT_FECHA_CREACION_FORMAT" />
+        <result property="auditFechaModificaFormat"     column="AUDIT_FECHA_MODIFICA_FORMAT" />
+    </resultMap>
+
+
+    <select id="listPaginated" resultMap="resultlistPaginated" parameterType="pe.gob.minjus.sisarb.model.request.CodigoSgdBusquedaRequest">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        FROM MAE_CODIGO_SGD
+        <include refid="listPaginatedWhere">
+            <property name="expedienteId" value="expedienteId"/>
+            <property name="asunto" value="asunto"/>
+            <property name="fechaEmision" value="fechaEmision"/>
+            <property name="celular" value="celular"/>
+            <property name="remitente" value="remitente"/>
+            <property name="correo" value="correo"/>
+            <property name="auditUsuarioCreacion" value="auditUsuarioCreacion"/>
+            <property name="auditFechaCreacion" value="auditFechaCreacion"/>
+            <property name="auditUsuarioModifica" value="auditUsuarioModifica"/>
+            <property name="auditFechaModifica" value="auditFechaModifica"/>
+        </include>
+        OFFSET #{filaInicio,jdbcType=INTEGER} ROWS FETCH NEXT #{cantidadPorPagina,jdbcType=INTEGER} ROWS ONLY
+    </select>
+
+    <sql id="listPaginatedWhere">
+        WHERE ESTADO='1'
+        <if test="expedienteId!=null"> AND EXPEDIENTE_ID=#{expedienteId} </if>
+        <if test="asunto!=null and asunto!=''"> AND UPPER(ASUNTO) LIKE '%'||UPPER(#{asunto})||'%' </if>
+        <if test="fechaEmision!=null and fechaEmision!=''">AND TO_CHAR(FECHA_EMISION, 'yyyy-mm-dd hh24:mi:ss') LIKE '%'||UPPER(#{fechaEmision})||'%'</if>
+        <if test="celular!=null and celular!=''"> AND UPPER(CELULAR) LIKE '%'||UPPER(#{celular})||'%' </if>
+        <if test="remitente!=null and remitente!=''"> AND UPPER(REMITENTE) LIKE '%'||UPPER(#{remitente})||'%' </if>
+        <if test="correo!=null and correo!=''"> AND UPPER(CORREO) LIKE '%'||UPPER(#{correo})||'%' </if>
+        <if test="auditUsuarioCreacion!=null and auditUsuarioCreacion!=''"> AND UPPER(AUDIT_USUARIO_CREACION) LIKE '%'||UPPER(#{auditUsuarioCreacion})||'%' </if>
+        <if test="auditFechaCreacion!=null and auditFechaCreacion!=''">AND TO_CHAR(AUDIT_FECHA_CREACION, 'yyyy-mm-dd hh24:mi:ss') LIKE '%'||UPPER(#{auditFechaCreacion})||'%'</if>
+        <if test="auditUsuarioModifica!=null and auditUsuarioModifica!=''"> AND UPPER(AUDIT_USUARIO_MODIFICA) LIKE '%'||UPPER(#{auditUsuarioModifica})||'%' </if>
+        <if test="auditFechaModifica!=null and auditFechaModifica!=''">AND TO_CHAR(AUDIT_FECHA_MODIFICA, 'yyyy-mm-dd hh24:mi:ss') LIKE '%'||UPPER(#{auditFechaModifica})||'%'</if>
+    </sql>
+
+    <!-- Query para calcular el total -->
+    <select id="listPaginatedTotal" resultType="java.lang.Integer" parameterType="pe.gob.minjus.sisarb.model.request.CodigoSgdBusquedaRequest">
+        select count(1) total FROM MAE_CODIGO_SGD
+        <include refid="listPaginatedWhere">
+            <property name="expedienteId" value="expedienteId"/>
+            <property name="asunto" value="asunto"/>
+            <property name="fechaEmision" value="fechaEmision"/>
+            <property name="celular" value="celular"/>
+            <property name="remitente" value="remitente"/>
+            <property name="correo" value="correo"/>
+            <property name="auditUsuarioCreacion" value="auditUsuarioCreacion"/>
+            <property name="auditFechaCreacion" value="auditFechaCreacion"/>
+            <property name="auditUsuarioModifica" value="auditUsuarioModifica"/>
+            <property name="auditFechaModifica" value="auditFechaModifica"/>
+        </include>
+    </select>
+
+    <insert id="save"  parameterType="pe.gob.minjus.sisarb.model.domain.CodigoSgd">
+        <selectKey keyProperty="codigoSgdId" order="BEFORE" resultType="java.lang.Integer">
+            SELECT SEQ_MAE_CODIGO_SGD.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO MAE_CODIGO_SGD (<include refid="columnsInsert" />) values
+        (
+        #{codigoSgdId, jdbcType=INTEGER},
+        #{expedienteId, jdbcType=INTEGER},
+        UPPER(#{asunto, jdbcType=VARCHAR}),
+        #{fechaEmision, jdbcType=DATE},
+        #{celular, jdbcType=VARCHAR},
+        UPPER(#{remitente, jdbcType=VARCHAR}),
+        UPPER(#{correo, jdbcType=VARCHAR}),
+        '1',
+        UPPER(#{auditUsuarioCreacion,jdbcType=VARCHAR}),
+        sysdate)
+    </insert>
+
+    <update id="update" parameterType="pe.gob.minjus.sisarb.model.domain.CodigoSgd">
+        UPDATE MAE_CODIGO_SGD
+        SET
+        AUDIT_FECHA_MODIFICA=sysdate
+        <if test="expedienteId != null">,EXPEDIENTE_ID =#{expedienteId, jdbcType=INTEGER} </if>
+        <if test="asunto != null and asunto!=''">,ASUNTO =UPPER(#{asunto, jdbcType=VARCHAR}) </if>
+        <if test="fechaEmision != null">,FECHA_EMISION =#{fechaEmision, jdbcType=DATE} </if>
+        <if test="celular != null and celular!=''">,CELULAR =#{celular, jdbcType=VARCHAR} </if>
+        <if test="remitente != null and remitente!=''">,REMITENTE =UPPER(#{remitente, jdbcType=VARCHAR}) </if>
+        <if test="correo != null and correo!=''">,CORREO =#{correo, jdbcType=VARCHAR} </if>
+        <if test="auditUsuarioModifica != null and auditUsuarioModifica!=''">, AUDIT_USUARIO_MODIFICA=UPPER(#{auditUsuarioModifica, jdbcType=VARCHAR}) </if>
+        where CODIGO_SGD_ID=#{codigoSgdId, jdbcType=INTEGER}
+    </update>
+
+    <select id="findById" resultMap="resultlistPaginated" parameterType="java.lang.Integer">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        FROM MAE_CODIGO_SGD
+        WHERE ESTADO='1' AND CODIGO_SGD_ID = #{id, jdbcType=INTEGER}
+    </select>
+
+    <update id="deleteById" parameterType="java.lang.Integer">
+        update MAE_CODIGO_SGD
+        set
+        estado='0'
+        where CODIGO_SGD_ID=#{id, jdbcType=INTEGER}
+    </update>
+
+
+</mapper>

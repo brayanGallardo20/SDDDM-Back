@@ -1,0 +1,15 @@
+server:
+  port: 8090
+#    servlet:
+#    context-path: /context
+
+#Multiple DataSource
+sisarb:
+  datasource:
+    #jdbc-url: jdbc:oracle:thin:@172.30.16.167:1521:minjus
+    #username: ARBITRAJE
+    #password: xXBGhokd6WMah85z0P5j6vL2oWj57B
+    #driverClassName: oracle.jdbc.driver.OracleDriver
+    jndi-name: java:/arbitraje_ds
+  audit:
+    owner-user: ARBITRAJE
