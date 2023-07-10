@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pe.gob.minjus.sisarb.model.mapper.MedicoMapper">
+
+    <sql id="columnsSelect">
+        P.NOMBRE,
+        P.APELLIDOP,
+        P.APELLIDOM,
+        P.CELULAR,
+        P.CORREO,
+        M.NUMEROCOLEG,
+        M.IDMEDICO
+    </sql>
+    
+    <sql id="columnsInsert">
+        NOMBRE,
+        APELLIDOP,
+        APELLIDOM,
+        FECHANAC,
+        CELULAR,
+        ESTADO,
+        FECHACREA,
+        USUCREA,
+        CORREO
+    </sql>
+    
+    <sql id="columnsInsertMedico">
+        IDPERSONA,
+        NUMEROCOLEG
+    </sql>
+
+
+    <resultMap id="resultlistPaginated" type="pe.gob.minjus.sisarb.model.domain.Medico">
+        <id  property="IDMEDICO"                 column="idMedico"  />
+        <result property="NOMBRE"                       column="nombre" />
+        <result property="APELLIDOP"                         column="apellidoP" />
+        <result property="APELLIDOM"         column="apellidoM" />
+        <result property="CELULAR"           column="celular" />
+        <result property="CORREO"           column="correo" />
+        <result property="NUMEROCOLEG"           column="numeroColeg" />                      
+    </resultMap>
+    
+    <select id="listPaginated" resultMap="resultlistPaginated" parameterType="pe.gob.minjus.sisarb.model.request.PersonaBusquedaRequest">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+        from tpersona p
+		inner join tmedico m on p.idpersona = m.idpersona
+        <include refid="listPaginatedWhere">
+            <property name="nombre" value="nombre"/>
+            <property name="apellidoP" value="apellidoP"/>
+            <property name="apellidoM" value="apellidoM"/>
+        </include>
+        OFFSET #{filaInicio,jdbcType=INTEGER} ROWS FETCH NEXT #{cantidadPorPagina,jdbcType=INTEGER} ROWS ONLY
+    </select>
+    
+    <sql id="listPaginatedWhere">
+        WHERE p.estado = 1
+        <if test="nombre != null and nombre!=''"> AND P.APELLIDOP  LIKE '%'|| REGEXP_REPLACE(TRIM(UPPER(#{apellidoP})), ' +', ' ')||'%' </if>
+        <if test="nombre != null and nombre!=''"> AND P.APELLIDOM  LIKE '%'|| REGEXP_REPLACE(TRIM(UPPER(#{apellidoM})), ' +', ' ')||'%' </if>
+        <if test="nombre != null and nombre!=''"> AND P.NOMBRE  LIKE '%'|| REGEXP_REPLACE(TRIM(UPPER(#{nombre})), ' +', ' ')||'%' </if>
+    </sql>
+
+    <!-- Query para calcular el total -->
+    <select id="listPaginatedTotal" resultType="java.lang.Integer" parameterType="pe.gob.minjus.sisarb.model.request.PersonaBusquedaRequest">
+        select count(1) total from tpersona p
+		inner join tmedico m on p.idpersona = m.idpersona
+        <include refid="listPaginatedWhere">
+            <property name="nombre" value="nombre"/>
+            <property name="apellidoP" value="apellidoP"/>
+            <property name="apellidoM" value="apellidoM"/>
+        </include>
+    </select>
+
+    <insert id="save"  parameterType="pe.gob.minjus.sisarb.model.domain.Persona">
+        INSERT INTO tpersona (<include refid="columnsInsert" />) values
+        (
+        #{nombre,jdbcType=VARCHAR},
+        #{apellidoP,jdbcType=VARCHAR},
+        #{apellidoM,jdbcType=VARCHAR},
+        sysdate,
+        #{celular, jdbcType=INTEGER},
+        1,
+        sysdate,
+        2                  
+        #{correo,jdbcType=VARCHAR})
+    </insert>
+        
+     <insert id="saveMedico"  parameterType="pe.gob.minjus.sisarb.model.domain.Medico">
+        INSERT INTO tmedico (<include refid="columnsInsertMedico" />) values
+        (
+        #{idMedico, jdbcType=INTEGER},
+        #{numeroColeg,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="update" parameterType="pe.gob.minjus.sisarb.model.domain.Medico">
+        UPDATE tpersona
+        SET
+        fechaModi=sysdate
+        <if test="nombre != null and nombre!=''">,NOMBRE =REGEXP_REPLACE(TRIM(UPPER(#{nombre, jdbcType=VARCHAR})), ' +', ' ') </if>
+        <if test="apellidoP != null and apellidoP!=''">, APELLIDOP=TRIM(UPPER(#{apellidoP, jdbcType=VARCHAR})) </if>
+        <if test="apellidoM != null and apellidoM!=''">, APELLIDOM=TRIM(UPPER(#{apellidoM, jdbcType=VARCHAR})) </if>
+        where idPersona=#{idPersona, jdbcType=INTEGER}
+    </update>
+
+    <select id="findById" resultMap="resultlistPaginated" parameterType="java.lang.Integer">
+        SELECT
+        <include refid="columnsSelect">
+        </include>
+		from tpersona p
+		inner join tmedico m on p.idpersona = m.idpersona
+        WHERE estado=1 AND idMedico = #{id, jdbcType=INTEGER}
+    </select>
+
+    <update id="deleteById" parameterType="java.lang.Integer">
+        UPDATE tpersona
+        SET
+        estado=0
+        where idPersona=#{id, jdbcType=INTEGER}
+    </update>
+
+</mapper>

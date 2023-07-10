@@ -21,15 +21,4 @@ public class GenericDomain {
 
     private String auditFechaCreacionFormat;
     private String auditFechaModificaFormat;
-
- /*  public GenericDomain(String auditUsuarioCreacion, Date auditFechaCreacion, String auditUsuarioModifica, Date auditFechaModifica) {
-        this.auditUsuarioCreacion = auditUsuarioCreacion;
-        this.auditFechaCreacion = auditFechaCreacion;
-        this.auditUsuarioModifica = auditUsuarioModifica;
-        this.auditFechaModifica = auditFechaModifica;
-    }
-
-   public GenericDomain(){
-
-    }*/
 }
